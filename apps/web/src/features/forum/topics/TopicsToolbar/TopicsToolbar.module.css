@@ -1,0 +1,123 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+
+.filters {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  gap: 16px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 211px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 4px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  color: #141b34;
+  transition: box-shadow 0.15s ease;
+}
+
+.search:focus-within { box-shadow: var(--inset-sm); }
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  color: var(--text);
+}
+
+.search input::placeholder {
+  color: var(--text);
+  opacity: 1;
+}
+
+
+.export,
+.newTopic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.export { border-radius: 8px; color: var(--text); }
+
+.newTopic {
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.export:active,
+.newTopic:active { box-shadow: var(--inset-sm); }
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@container topics (max-width: 760px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .search {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .selectSlot { width: 100%; }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+@container topics (max-width: 420px) {
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters > .selectSlot:last-child { grid-column: 1 / -1; }
+  .export,
+  .newTopic { padding: 0 12px; font-size: 15px; }
+}

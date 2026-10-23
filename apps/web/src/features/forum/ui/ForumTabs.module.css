@@ -1,0 +1,80 @@
+.scroller {
+  margin-inline: -4px;
+  padding: 2px 4px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.scroller::-webkit-scrollbar { display: none; }
+
+.inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.list {
+  display: flex;
+  gap: 54px;
+}
+
+.tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab::after {
+  content: attr(data-text) / '';
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.tab[aria-selected='true'] {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.track {
+  position: relative;
+  height: 8px;
+  border-radius: 32px;
+  background: var(--bg);
+  box-shadow: var(--inset-sm);
+}
+
+.indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 72px;
+  height: 100%;
+  border-radius: 32px;
+  background: var(--primary);
+  transition: transform 0.25s ease, width 0.25s ease;
+}
+
+@media (max-width: 767px) {
+  .list { gap: 28px; }
+  .tab { font-size: 16px; line-height: 24px; }
+  .track { height: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator { transition: none; }
+}

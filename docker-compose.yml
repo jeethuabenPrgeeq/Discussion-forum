@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: forum
+      POSTGRES_PASSWORD: forum
+      POSTGRES_DB: forum
+    ports:
+      - "5433:5432"
+    volumes:
+      - forum-pgdata:/var/lib/postgresql/data
+
+volumes:
+  forum-pgdata:

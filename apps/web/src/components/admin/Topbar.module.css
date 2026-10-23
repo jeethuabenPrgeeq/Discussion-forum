@@ -1,0 +1,118 @@
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80px;
+  padding: 0 24px;
+  background: var(--bg);
+  border-bottom: 1px solid #d8dae0;
+  box-shadow: var(--raised-md);
+}
+
+.menuBtn { display: none; }
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+}
+
+.bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--inset-md);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: var(--alert);
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: -4px -4px 4px var(--sh-light), 4px 4px 4px var(--sh-dark);
+}
+
+.avatar img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #d9d9d9;
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.role {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+@media (max-width: 1023px) {
+  .topbar { height: 64px; padding: 0 16px; }
+  .menuBtn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--bg);
+    box-shadow: var(--raised-sm);
+    color: var(--text-strong);
+    cursor: pointer;
+  }
+  .right { gap: 16px; }
+  .bell { width: 40px; height: 40px; }
+}
+
+@media (max-width: 599px) {
+  .who { display: none; }
+}

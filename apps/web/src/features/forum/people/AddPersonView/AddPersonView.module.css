@@ -1,0 +1,146 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.back,
+.bulk,
+.btn {
+  border: 0;
+  background: #dfe6e9;
+  font: inherit;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px 0 10px;
+  border-radius: 6px;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c6c6c9;
+  font-size: 14px;
+  line-height: 22px;
+  color: #374151;
+}
+
+.bulk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 8px;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c4c4c4;
+  font-size: 16px;
+  line-height: 24px;
+  color: #2f3547;
+}
+
+.card {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #dfe6e9;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: #2d4cc8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  min-width: 119px;
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 24px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 8px #c4c4c4;
+  font-size: 18px;
+  line-height: 26px;
+  color: #374151;
+}
+
+.submit {
+  font-weight: 700;
+  color: #2d4cc8;
+}
+
+.back:active,
+.bulk:active,
+.btn:active {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+}
+
+.back:focus-visible,
+.bulk:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@container (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer .btn {
+    flex: 1;
+  }
+}

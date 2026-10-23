@@ -1,0 +1,135 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 56px;
+  padding: 10px 16px;
+  border: 1px dashed #7f7c7c;
+  border-radius: 8px;
+  background: var(--bg);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.zone[data-compact] {
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.zone[data-compact] .button {
+  width: auto;
+  height: 42px;
+  gap: 6px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.zone[data-dragging] {
+  border-color: var(--primary);
+  background: var(--blue-soft);
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  clip: rect(0 0 0 0);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: none;
+  width: 100px;
+  height: 36px;
+  border-radius: 6px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.button:active { box-shadow: var(--inset-sm); }
+
+.button[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input:focus-visible + .button {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.hint {
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0.03em;
+  color: var(--text-strong);
+}
+
+.files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  height: 30px;
+  padding: 0 6px 0 12px;
+  border-radius: 36px;
+  box-shadow: var(--inset-sm);
+  font-size: 13px;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--red);
+}
+
+@media (max-width: 599px) {
+  .wrap { width: 100%; }
+  .zone { flex-wrap: wrap; }
+  .hint { font-size: 13px; }
+}

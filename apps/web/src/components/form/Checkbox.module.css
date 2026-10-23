@@ -1,0 +1,77 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.root[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: #dfe6e9;
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px rgba(196, 196, 196, 0.8);
+  transition: box-shadow 0.15s ease;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: #2d4cc8;
+  color: #ffffff;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.input:checked + .box {
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px rgba(196, 196, 196, 0.8);
+}
+
+.input:checked + .box .mark {
+  opacity: 1;
+  transform: none;
+}
+
+.input:focus-visible + .box {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+  color: #374151;
+}
+
+.input:checked ~ .label {
+  font-weight: 600;
+  color: #2d4cc8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box,
+  .mark {
+    transition: none;
+  }
+}

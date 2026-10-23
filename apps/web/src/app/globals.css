@@ -1,0 +1,46 @@
+:root {
+  --bg: #dfe6e9;
+  --surface-muted: #d7dfe3;
+  --primary: #2d4cc8;
+  --primary-dark: #243fa8;
+  --ink: #31344b;
+  --text-strong: #374151;
+  --text: #2f3547;
+  --text-muted: rgba(49, 52, 75, 0.8);
+  --line: #d7d5d5;
+  --line-strong: #b3b3b3;
+  --sh-light: #ffffff;
+  --sh-dark: #c4c4c4;
+  --raised-sm: -2px -2px 2px var(--sh-light), 2px 2px 2px var(--sh-dark);
+  --raised-md: -4px -4px 4px var(--sh-light), 4px 4px 4px var(--sh-dark);
+  --raised-card: -4px -4px 8px var(--sh-light), 4px 4px 8px rgba(196, 196, 196, 0.8);
+  --raised-lg: -8px -8px 16px var(--sh-light), 8px 8px 16px #c6c6c9;
+  --inset-sm: inset -2px -2px 2px var(--sh-light), inset 2px 2px 2px var(--sh-dark);
+  --inset-md: inset -4px -4px 4px var(--sh-light), inset 4px 4px 4px var(--sh-dark);
+  --green: #2a7308;
+  --green-soft: #e9eee6;
+  --green-pill: #d2ddcd;
+  --purple: #67096e;
+  --purple-soft: #eae3ea;
+  --orange: #c05512;
+  --orange-soft: #ede9e6;
+  --blue-soft: #d8e4e9;
+  --red: #a91e2c;
+  --alert: #e01e5a;
+  --font: 'Segoe UI', sans-serif;
+  --olive: #63560b;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }

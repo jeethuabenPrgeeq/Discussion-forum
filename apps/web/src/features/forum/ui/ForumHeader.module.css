@@ -1,0 +1,132 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: var(--primary);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 36px;
+  background: var(--bg);
+  box-shadow: var(--inset-sm);
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.03em;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live,
+.draft {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px 0 11px;
+  border: 0.8px solid currentColor;
+  border-radius: 36px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.live { background: var(--green-pill); color: var(--green); }
+.draft { background: var(--bg); color: var(--text-muted); }
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.posted {
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.deadlines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.deadline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 24px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.blue { color: var(--primary); background: var(--blue-soft); }
+.purple { color: var(--purple); background: var(--purple-soft); }
+.orange { color: var(--orange); background: var(--orange-soft); }
+.green { color: var(--green); background: var(--green-soft); }
+
+@media (max-width: 767px) {
+  .card { gap: 16px; padding: 16px; border-radius: 12px; }
+  .title { font-size: 20px; line-height: 28px; }
+  .meta { gap: 10px; }
+  .chip,
+  .live,
+  .draft { height: 30px; padding-inline: 12px; font-size: 13px; }
+  .deadlines {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .deadline {
+    height: auto;
+    min-height: 38px;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 359px) {
+  .deadlines { grid-template-columns: 1fr; }
+}
