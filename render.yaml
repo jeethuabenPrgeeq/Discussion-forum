@@ -17,7 +17,7 @@ services:
     startCommand: pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
     envVars:
       - key: NODE_VERSION
-        value: 22.12.0
+        value: 24.14.0
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
@@ -53,7 +53,7 @@ services:
     startCommand: pnpm --filter web start
     envVars:
       - key: NODE_VERSION
-        value: 22.12.0
+        value: 24.14.0
       - key: NEXT_PUBLIC_API_URL
         value: /api
       - key: API_PROXY_TARGET
