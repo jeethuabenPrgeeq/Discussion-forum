@@ -13,7 +13,7 @@ services:
     region: singapore
     plan: free
     branch: feature/forum-complete
-    buildCommand: npm install -g pnpm@12.4.1 && pnpm install --frozen-lockfile && pnpm --filter api exec prisma generate && pnpm --filter api build
+    buildCommand: npm install -g pnpm@12.4.1 && pnpm install --frozen-lockfile --prod=false && pnpm --filter api exec prisma generate && pnpm --filter api build
     startCommand: pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
     envVars:
       - key: NODE_VERSION
