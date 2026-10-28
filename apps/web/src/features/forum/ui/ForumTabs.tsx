@@ -4,18 +4,21 @@ import { useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 import type { ForumTabKey } from '@/features/forum/lib/types';
 import styles from './ForumTabs.module.css';
 
-export const FORUM_TABS: { key: ForumTabKey; label: string }[] = [
+export type ShellTabKey = ForumTabKey | 'questions';
+
+export const FORUM_TABS: { key: ShellTabKey; label: string }[] = [
   { key: 'forum', label: 'Forum' },
   { key: 'settings', label: 'Settings' },
   { key: 'people', label: 'People' },
   { key: 'grades', label: 'Grades' },
   { key: 'reports', label: 'Reports' },
+  { key: 'questions', label: 'Questions' },
   { key: 'access', label: 'Access' },
 ];
 
 interface ForumTabsProps {
-  active: ForumTabKey;
-  onChange: (key: ForumTabKey) => void;
+  active: ShellTabKey;
+  onChange: (key: ShellTabKey) => void;
 }
 
 export default function ForumTabs({ active, onChange }: ForumTabsProps) {
@@ -52,11 +55,15 @@ export default function ForumTabs({ active, onChange }: ForumTabsProps) {
     const i = FORUM_TABS.findIndex((t) => t.key === active);
     const last = FORUM_TABS.length - 1;
     const next =
-      e.key === 'ArrowRight' ? (i + 1) % FORUM_TABS.length
-      : e.key === 'ArrowLeft' ? (i - 1 + FORUM_TABS.length) % FORUM_TABS.length
-      : e.key === 'Home' ? 0
-      : e.key === 'End' ? last
-      : null;
+      e.key === 'ArrowRight'
+        ? (i + 1) % FORUM_TABS.length
+        : e.key === 'ArrowLeft'
+          ? (i - 1 + FORUM_TABS.length) % FORUM_TABS.length
+          : e.key === 'Home'
+            ? 0
+            : e.key === 'End'
+              ? last
+              : null;
     if (next === null) return;
     e.preventDefault();
     const { key } = FORUM_TABS[next];

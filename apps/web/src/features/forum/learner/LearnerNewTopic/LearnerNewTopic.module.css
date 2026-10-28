@@ -1,0 +1,127 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 4px;
+  background: #dfe6e9;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c4c4c4;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: #2f3547;
+  cursor: pointer;
+}
+
+.back:active {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+}
+
+.back:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.card {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px;
+  background: #dfe6e9;
+  border-radius: 16px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #2d4cc8;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: #c0122e;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 32px;
+}
+
+.actions {
+  align-self: stretch;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 24px 40px;
+}
+
+.btn {
+  min-width: 140px;
+  height: 52px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 26px;
+  background: #dfe6e9;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 8px #c4c4c4;
+  font-family: inherit;
+  font-size: 20px;
+  letter-spacing: 0.03em;
+  color: #374151;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.btn:active {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 4px #c4c4c4;
+}
+
+.btn:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.primary {
+  font-weight: 700;
+  color: #2d4cc8;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .btn {
+    flex: 1;
+    min-width: 0;
+    font-size: 17px;
+  }
+}

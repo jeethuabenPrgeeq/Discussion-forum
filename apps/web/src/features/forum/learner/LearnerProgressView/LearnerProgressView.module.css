@@ -1,0 +1,162 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: "Segoe UI", sans-serif;
+  color: #2f3547;
+}
+
+.progressCard {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px;
+  background: #dfe6e9;
+  border-radius: 16px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+}
+
+.doneTitle {
+  margin: 0;
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #2a7308;
+}
+
+.track {
+  height: 24px;
+  padding: 4px;
+  box-sizing: border-box;
+  border-radius: 36px;
+  background: #dfe6e9;
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: 36px;
+  background: #2a7308;
+  transition: width 0.3s ease;
+}
+
+.card {
+  padding: 32px;
+  background: #dfe6e9;
+  border-radius: 16px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+}
+
+.tableScroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 720px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 1px solid #cdcdcd;
+}
+
+.colPost {
+  width: 40.3%;
+}
+
+.colType {
+  width: 13.9%;
+}
+
+.colDate {
+  width: 18.2%;
+}
+
+.colWords {
+  width: 11.8%;
+}
+
+.colStatus {
+  width: 15.8%;
+}
+
+.table th {
+  height: 64px;
+  padding: 0 20px;
+  background: #d7dfe3;
+  border-right: 1px solid #d7d5d5;
+  text-align: left;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+}
+
+.table td {
+  height: 82px;
+  padding: 0 20px;
+  border-top: 1px solid #d7d5d5;
+  border-right: 1px solid #d7d5d5;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+}
+
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+.table .postCell {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+  height: 28px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 36px;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.counted {
+  background: #d2ddcd;
+  border: 0.8px solid #2a7308;
+  color: #2a7308;
+}
+
+.under {
+  background: #e5e1de;
+  border: 0.8px solid #c05512;
+  color: #c05512;
+}
+
+.empty {
+  text-align: center;
+  color: #7f7c7c;
+}
+
+@media (max-width: 640px) {
+  .progressCard,
+  .card {
+    padding: 20px;
+  }
+
+  .doneTitle {
+    font-size: 26px;
+  }
+}

@@ -1,8 +1,7 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import { Plus, Search, X } from "lucide-react";
-import { DownloadIcon } from "@/components/icons";
+import { Plus, Search, Upload, X } from "lucide-react";
 import Select from "@/components/form/Select";
 import AddPersonView from "@/features/forum/people/AddPersonView/AddPersonView";
 import BulkUploadDialog, { type BulkResult } from "@/features/forum/people/BulkUploadDialog/BulkUploadDialog";
@@ -131,7 +130,7 @@ export default function PeopleView() {
 
               <div className={styles.actions}>
                 <button type="button" className={styles.button} onClick={() => setBulkOpen(true)}>
-                  <DownloadIcon aria-hidden />
+                  <Upload size={22} strokeWidth={1.5} aria-hidden />
                   Bulk Upload
                 </button>
                 <button type="button" className={`${styles.button} ${styles.primary}`} onClick={() => setMode("add")}>

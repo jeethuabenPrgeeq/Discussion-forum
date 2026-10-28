@@ -35,18 +35,24 @@ export const formatDay = (isoDate: string) => dayFormatter.format(new Date(`${is
 
 function matchesStatus(topic: ForumTopic, key: TopicFilterKey) {
   switch (key) {
-    case 'unread':
-      return !!topic.isUnread;
     case 'pinned':
       return topic.isPinned;
     case 'answered':
       return topic.state === 'answered';
+    case 'unanswered':
+      return topic.state === 'open';
+    case 'locked':
+      return topic.isLocked;
     case 'reported':
       return (topic.reportCount ?? 0) > 0;
+    case 'replyNeeded':
+      return topic.participation === 'required';
     default:
       return true;
   }
 }
+
+const titleCollator = new Intl.Collator('en', { sensitivity: 'base', numeric: true });
 
 export function filterTopics(topics: ForumTopic[], filters: TopicFilters) {
   const q = filters.query.trim().toLowerCase();
@@ -57,9 +63,8 @@ export function filterTopics(topics: ForumTopic[], filters: TopicFilters) {
   const comparators: Record<TopicSort, (a: ForumTopic, b: ForumTopic) => number> = {
     latest: byLatest,
     replies: (a, b) => b.replies - a.replies || byLatest(a, b),
-    newest: (a, b) => created(b) - created(a),
-    answered: (a, b) => Number(b.state === 'answered') - Number(a.state === 'answered') || byLatest(a, b),
-    reported: (a, b) => (b.reportCount ?? 0) - (a.reportCount ?? 0) || byLatest(a, b),
+    oldest: (a, b) => created(a) - created(b),
+    az: (a, b) => titleCollator.compare(a.title, b.title),
   };
 
   return topics

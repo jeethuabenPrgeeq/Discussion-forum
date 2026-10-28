@@ -5,11 +5,12 @@ import { ArrowLeft, Mail, UserRound } from 'lucide-react';
 import { DownloadIcon } from '@/components/icons';
 import Checkbox from '@/components/form/Checkbox';
 import { DateTimeField, SelectField, SwitchField, TextField } from '@/components/form/FormFields';
+import { api, ApiError } from '@/features/forum/lib/api';
 import { useForum } from '@/features/forum/lib/store';
 import { WEEKS } from '@/features/forum/lib/mock';
-import { EMAIL_PATTERN, createPerson, displayName, groupFromOption } from '@/features/forum/lib/people';
+import { EMAIL_PATTERN, groupFromOption } from '@/features/forum/lib/people';
 import { GROUP_OPTIONS, ROLE_OPTIONS } from '@/features/forum/lib/options';
-import type { ForumSettings, PersonRole } from '@/features/forum/lib/types';
+import type { ForumPerson, ForumSettings, PersonRole } from '@/features/forum/lib/types';
 import styles from './AddPersonView.module.css';
 
 interface AddPersonViewProps {
@@ -45,7 +46,7 @@ const emptyDraft = (settings: ForumSettings): PersonDraft => ({
 });
 
 export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPersonViewProps) {
-  const { weekId, peopleFor, addPeople, settingsFor } = useForum();
+  const { weekId, peopleFor, settingsFor, forumIdFor, loadPeople } = useForum();
   const settings = settingsFor(weekId);
   const titleId = useId();
   const refs = {
@@ -59,6 +60,7 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
   const [emailInvite, setEmailInvite] = useState(true);
   const [allWeeks, setAllWeeks] = useState(false);
   const [addAnother, setAddAnother] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const set = <K extends keyof PersonDraft>(key: K, value: PersonDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -87,8 +89,9 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
     return next;
   };
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (saving) return;
     const found = validate();
     if (Object.keys(found).length) {
       setErrors(found);
@@ -97,38 +100,48 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
       return;
     }
 
-    const person = {
-      ...createPerson(
-        {
-          firstName: draft.firstName.trim(),
-          lastName: draft.lastName.trim(),
-          email: draft.email.trim().toLowerCase(),
-          role: draft.role,
-          group: groupFromOption(draft.group),
-        },
-        settings,
-      ),
-      accessStarts: draft.accessStarts,
-      accessEnds: draft.accessEnds,
-      canPost: draft.canPost,
-      reminder: draft.reminder,
-    };
-
-    const targets = allWeeks ? WEEKS.map((w) => w.id) : [weekId];
-    let added = 0;
-    for (const id of targets) {
-      if (peopleFor(id).some((p) => p.email === person.email)) continue;
-      addPeople(id, [{ ...person, id: `${person.id}-${id}` }]);
-      added += 1;
+    const targets = (allWeeks ? WEEKS.map((w) => w.id) : [weekId]).filter((id) => forumIdFor(id));
+    if (targets.length === 0) {
+      setErrors({ email: "The forum hasn't loaded yet. Refresh and try again." });
+      return;
     }
 
+    const body = {
+      firstName: draft.firstName.trim(),
+      lastName: draft.lastName.trim(),
+      email: draft.email.trim().toLowerCase(),
+      role: draft.role === 'observer' ? 'observer' : 'learner',
+      group: groupFromOption(draft.group),
+      sendInvite: emailInvite,
+    };
+
+    setSaving(true);
+    let added = 0;
+    let lastError: string | null = null;
+
+    for (const id of targets) {
+      const forumId = forumIdFor(id);
+      try {
+        const person = await api<ForumPerson>(`/forums/${forumId}/people`, { method: 'POST', json: body });
+        if (!draft.canPost && person?.id) {
+          await api(`/forums/${forumId}/people/${person.id}`, { method: 'PATCH', json: { canPost: false } });
+        }
+        added += 1;
+        await loadPeople(id, true);
+      } catch (error) {
+        lastError = error instanceof ApiError ? error.message : 'Could not add this person. Please try again.';
+      }
+    }
+
+    setSaving(false);
+
     if (added === 0) {
-      setErrors({ email: 'This person is already in every week.' });
+      setErrors({ email: lastError ?? 'This person is already in every week.' });
       refs.email.current?.focus();
       return;
     }
 
-    const name = displayName(person);
+    const name = `${body.firstName} ${body.lastName.charAt(0)}`.trim();
     const message = allWeeks ? `${name} added to ${added} ${added === 1 ? 'week' : 'weeks'}.` : `${name} added.`;
 
     if (addAnother) {
@@ -151,7 +164,7 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
         </button>
       </div>
 
-      <form className={styles.card} aria-labelledby={titleId} onSubmit={submit} noValidate>
+      <form className={styles.card} aria-labelledby={titleId} onSubmit={(e) => void submit(e)} noValidate>
         <h2 id={titleId} className={styles.title}>
           Add Person
         </h2>
@@ -207,18 +220,8 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
             onChange={(v) => set('accessEnds', v)}
             error={errors.accessEnds}
           />
-          <SwitchField
-            label="Can Post"
-            text="Allow learner to post"
-            checked={draft.canPost}
-            onChange={(v) => set('canPost', v)}
-          />
-          <SwitchField
-            label="Reminder"
-            text="Send Reminder"
-            checked={draft.reminder}
-            onChange={(v) => set('reminder', v)}
-          />
+          <SwitchField label="Can Post" text="Allow learner to post" checked={draft.canPost} onChange={(v) => set('canPost', v)} />
+          <SwitchField label="Reminder" text="Send Reminder" checked={draft.reminder} onChange={(v) => set('reminder', v)} />
         </div>
 
         <fieldset className={styles.options}>
@@ -229,11 +232,11 @@ export default function AddPersonView({ onBack, onBulkUpload, onSaved }: AddPers
         </fieldset>
 
         <div className={styles.footer}>
-          <button type="button" className={styles.btn} onClick={onBack}>
+          <button type="button" className={styles.btn} onClick={onBack} disabled={saving}>
             Cancel
           </button>
-          <button type="submit" className={`${styles.btn} ${styles.submit}`}>
-            Add Person
+          <button type="submit" className={`${styles.btn} ${styles.submit}`} disabled={saving}>
+            {saving ? 'Adding…' : 'Add Person'}
           </button>
         </div>
       </form>

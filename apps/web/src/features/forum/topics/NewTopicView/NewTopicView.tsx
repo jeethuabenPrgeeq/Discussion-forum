@@ -7,11 +7,13 @@ import { CalendarDays, ChevronDown } from 'lucide-react';
 import AttachDropzone from '@/features/forum/topics/AttachDropzone/AttachDropzone';
 import BackLink from '@/components/ui/BackLink';
 import DropdownMenu from '@/components/ui/DropdownMenu';
+import ConfirmDialog from '@/components/ui/ConfirmDialog/ConfirmDialog';
 import RichTextEditor, { type RichTextEditorHandle } from '@/components/editor/RichTextEditor';
 import Select from '@/components/form/Select';
 import Toast, { useToast } from '@/components/toast/Toast';
 import Toggle from '@/components/form/Toggle';
-import { CURRENT_USER, GROUPS, WEEKS, getForumDetail, getSubjectSuggestions } from '@/features/forum/lib/mock';
+import { uploadFiles, type UploadedFile } from '@/features/forum/lib/api';
+import { CURRENT_USER, GROUPS, WEEKS, getSubjectSuggestions } from '@/features/forum/lib/mock';
 import { useForum } from '@/features/forum/lib/store';
 import { FORUM_BASE, topicHref } from '@/features/forum/lib/routes';
 import { ALL_GROUPS } from '@/features/forum/lib/utils';
@@ -56,6 +58,8 @@ const NOTIFY: Option[] = [
 
 const draftKeyFor = (weekId: string) => `forum-new-topic-draft:${weekId}`;
 
+const toAttachments = (files: UploadedFile[]) => files.map((f) => ({ id: f.id, name: f.name, size: f.size, url: f.url }));
+
 function defaultForm(repliesDue: string): NewTopicForm {
   return {
     subject: '',
@@ -84,14 +88,7 @@ function SelectField({ id, label, value, options, onChange }: SelectFieldProps) 
       <span id={`${id}-label`} className={styles.label}>
         {label}
       </span>
-      <Select
-        id={id}
-        variant="field"
-        labelledBy={`${id}-label`}
-        value={value}
-        options={options}
-        onChange={onChange}
-      />
+      <Select id={id} variant="field" labelledBy={`${id}-label`} value={value} options={options} onChange={onChange} />
     </div>
   );
 }
@@ -121,9 +118,9 @@ function SwitchField({ id, label, text, checked, disabled, onChange }: SwitchFie
 
 export default function NewTopicView() {
   const router = useRouter();
-  const { weekId, addTopic } = useForum();
+  const { weekId, addTopic, forumDetailFor } = useForum();
   const week = WEEKS.find((w) => w.id === weekId) ?? WEEKS[0];
-  const forum = getForumDetail(week);
+  const forum = forumDetailFor(weekId);
   const suggestions = getSubjectSuggestions(week);
   const draftKey = draftKeyFor(weekId);
   const uid = useId();
@@ -135,14 +132,15 @@ export default function NewTopicView() {
   const [files, setFiles] = useState<File[]>([]);
   const [messageEmpty, setMessageEmpty] = useState(true);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [posting, setPosting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const toast = useToast();
 
   const isAnnouncement = form.kind === 'notice';
   const replyByEnabled = form.replyRequired && !isAnnouncement;
   const dirty = form.subject.trim() !== '' || !messageEmpty || files.length > 0;
 
-  const update = <K extends keyof NewTopicForm>(key: K, value: NewTopicForm[K]) =>
-    setForm((f) => ({ ...f, [key]: value }));
+  const update = <K extends keyof NewTopicForm>(key: K, value: NewTopicForm[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   useEffect(() => {
     try {
@@ -169,11 +167,16 @@ export default function NewTopicView() {
   };
 
   const cancel = () => {
-    if (dirty && !window.confirm('Discard this topic? Unsaved changes will be lost.')) return;
+    if (posting) return;
+    if (dirty) {
+      setConfirmOpen(true);
+      return;
+    }
     router.push(FORUM_BASE);
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (posting) return;
     const editor = editorRef.current;
     const html = editor && !editor.isEmpty() ? DOMPurify.sanitize(editor.getHTML(), { USE_PROFILES: { html: true } }) : '';
     const nextErrors: FormErrors = {
@@ -190,6 +193,18 @@ export default function NewTopicView() {
       return;
     }
 
+    setPosting(true);
+    let uploaded: UploadedFile[] = [];
+    if (files.length) {
+      try {
+        uploaded = await uploadFiles(files);
+      } catch (error) {
+        toast.show(error instanceof Error ? error.message : 'Could not upload the files. Please try again.');
+        setPosting(false);
+        return;
+      }
+    }
+
     const now = new Date().toISOString();
     const topicId = `t-${crypto.randomUUID()}`;
     const topic: ForumTopic = {
@@ -203,7 +218,7 @@ export default function NewTopicView() {
       isPinned: form.pinned,
       isLocked: false,
       participation: isAnnouncement ? null : form.replyRequired ? 'required' : 'optional',
-      group: form.group,
+      group: form.group === ALL_GROUPS ? '' : form.group,
       kind: form.kind,
       replyBy: replyByEnabled ? form.replyBy : undefined,
       lockAfterDue: form.lockReplies,
@@ -212,16 +227,21 @@ export default function NewTopicView() {
       reportCount: 0,
     };
 
-    addTopic(weekId, topic, {
-      id: `p-${crypto.randomUUID()}`,
-      topicId,
-      author: CURRENT_USER,
-      body: html,
-      createdAt: now,
-      isBestAnswer: false,
-      isPrivate: false,
-      attachments: files.map((f) => ({ name: f.name, size: f.size })),
-    });
+    addTopic(
+      weekId,
+      topic,
+      {
+        id: `p-${crypto.randomUUID()}`,
+        topicId,
+        author: CURRENT_USER,
+        body: html,
+        createdAt: now,
+        isBestAnswer: false,
+        isPrivate: false,
+        attachments: toAttachments(uploaded),
+      },
+      uploaded.map((f) => f.id),
+    );
 
     try {
       window.localStorage.removeItem(draftKey);
@@ -295,20 +315,8 @@ export default function NewTopicView() {
             options={[ALL_GROUPS, ...GROUPS].map((g) => ({ value: g, label: g }))}
             onChange={(v) => update('group', v)}
           />
-          <SelectField
-            id={fieldId('type')}
-            label="Type"
-            value={form.kind}
-            options={TYPES}
-            onChange={(v) => update('kind', v as TopicKind)}
-          />
-          <SwitchField
-            id={fieldId('pin')}
-            label="Pin to Top"
-            text="Permission to Pin"
-            checked={form.pinned}
-            onChange={(v) => update('pinned', v)}
-          />
+          <SelectField id={fieldId('type')} label="Type" value={form.kind} options={TYPES} onChange={(v) => update('kind', v as TopicKind)} />
+          <SwitchField id={fieldId('pin')} label="Pin to Top" text="Permission to Pin" checked={form.pinned} onChange={(v) => update('pinned', v)} />
           <SwitchField
             id={fieldId('lock')}
             label="Lock replies"
@@ -340,37 +348,37 @@ export default function NewTopicView() {
               <CalendarDays size={24} strokeWidth={1.5} className={styles.trailingIcon} aria-hidden />
             </div>
           </div>
-          <SwitchField
-            id={fieldId('grade')}
-            label="Grade it"
-            text="Permission for Grading"
-            checked={form.graded}
-            onChange={(v) => update('graded', v)}
-          />
-          <SelectField
-            id={fieldId('notify')}
-            label="Notify"
-            value={form.notify}
-            options={NOTIFY}
-            onChange={(v) => update('notify', v as NotifyWhen)}
-          />
+          <SwitchField id={fieldId('grade')} label="Grade it" text="Permission for Grading" checked={form.graded} onChange={(v) => update('graded', v)} />
+          <SelectField id={fieldId('notify')} label="Notify" value={form.notify} options={NOTIFY} onChange={(v) => update('notify', v as NotifyWhen)} />
         </div>
       </section>
 
       <div className={styles.footer}>
         <AttachDropzone onChange={setFiles} />
         <div className={styles.actions}>
-          <button type="button" className={styles.btn} onClick={cancel}>
+          <button type="button" className={styles.btn} onClick={cancel} disabled={posting}>
             Cancel
           </button>
-          <button type="button" className={styles.btn} onClick={saveDraft}>
+          <button type="button" className={styles.btn} onClick={saveDraft} disabled={posting}>
             Save Draft
           </button>
-          <button type="button" className={`${styles.btn} ${styles.primary}`} onClick={submit}>
-            Post
+          <button type="button" className={`${styles.btn} ${styles.primary}`} onClick={() => void submit()} disabled={posting}>
+            {posting ? (files.length ? 'Uploading…' : 'Posting…') : 'Post'}
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Discard this topic?"
+        message="Unsaved changes and attached files will be lost."
+        confirmLabel="Discard"
+        onConfirm={() => {
+          setConfirmOpen(false);
+          router.push(FORUM_BASE);
+        }}
+        onCancel={() => setConfirmOpen(false)}
+      />
 
       <Toast message={toast.message} />
     </div>

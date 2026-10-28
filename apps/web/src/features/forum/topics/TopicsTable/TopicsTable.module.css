@@ -21,13 +21,14 @@
   color: var(--text);
 }
 
-.colTopic { width: 25.2%; }
-.colAuthor { width: 12.1%; }
-.colReplies { width: 9.3%; }
-.colActivity { width: 11.8%; }
-.colStatus { width: 10.7%; }
-.colParticipation { width: 12.8%; }
-.table thead .colActions { width: 18.1%; text-align: center; }
+.colTopic { width: 20.9%; }
+.colAuthor { width: 10.9%; }
+.colGroup { width: 7.3%; }
+.colReplies { width: 7.3%; }
+.colActivity { width: 12.6%; }
+.colStatus { width: 10.6%; }
+.colParticipation { width: 12.2%; }
+.table thead .colActions { width: 18.2%; text-align: center; }
 
 .cell {
   height: 60px;
@@ -79,38 +80,10 @@
 .status[data-status='answered'] { color: var(--green); }
 .status[data-status='locked'] { color: var(--red); }
 .status[data-status='notice'] { color: var(--primary); }
+.status[data-status='unread'] { color: var(--primary); }
 .status[data-status='open'] { color: var(--text-muted); }
 
 .actionsCell { text-align: center; }
-
-.actions {
-  display: inline-flex;
-  gap: 12px;
-}
-
-.iconBtn {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: var(--bg);
-  box-shadow: var(--raised-sm);
-  color: var(--text-strong);
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, color 0.15s ease;
-}
-
-.iconBtn:hover { color: var(--primary); }
-
-.iconBtn[aria-pressed='true'] {
-  box-shadow: var(--inset-sm);
-  color: var(--primary);
-}
-
-.iconBtn[data-tone='danger']:hover { color: var(--red); }
 
 .empty {
   padding: 40px 16px;
@@ -124,8 +97,6 @@
   .table thead th { padding: 0 8px 0 12px; font-size: 15px; }
   .cell { padding: 0 8px 0 12px; }
   .topic { font-size: 15px; }
-  .actions { gap: 8px; }
-  .iconBtn { width: 30px; height: 30px; }
 }
 
 @container topics (max-width: 879px) {
@@ -176,12 +147,10 @@
 
   .actionsCell {
     grid-column: 1 / -1;
+    align-items: flex-end;
     padding-top: 12px;
     border-top: 1px solid var(--line);
   }
-
-  .actions { gap: 12px; }
-  .iconBtn { width: 36px; height: 36px; }
 }
 
 @container topics (max-width: 480px) {

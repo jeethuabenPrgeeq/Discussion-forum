@@ -1,30 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { DeleteIcon, LockKeyholeIcon, MoveIcon, PinIcon } from "@/components/icons";
+import ChoiceMenu from "@/components/form/ChoiceMenu/ChoiceMenu";
 import type { ForumTopic } from "@/features/forum/lib/types";
 import { STATUS_LABEL, pad2, statusOf, timeAgo } from "@/features/forum/lib/utils";
-import styles from "./TopicsTable.module.css";
 import { topicHref } from "@/features/forum/lib/routes";
+import styles from "./TopicsTable.module.css";
 
 const PARTICIPATION = { required: "Required", optional: "Optional" } as const;
 
-interface IconButtonProps {
-  label: string;
-  context: string;
-  pressed?: boolean;
-  danger?: boolean;
-  onClick: () => void;
-  children: ReactNode;
+function displayStatus(topic: ForumTopic): { key: string; label: string } {
+  const base = statusOf(topic);
+  if (topic.isUnread && (base === "open" || base === "notice")) return { key: "unread", label: "Unread" };
+  return { key: base, label: STATUS_LABEL[base] };
 }
 
-function IconButton({ label, context, pressed, danger, onClick, children }: IconButtonProps) {
-  return (
-    <button type="button" className={styles.iconBtn} title={label} aria-label={`${label}: ${context}`} aria-pressed={pressed} data-tone={danger ? "danger" : undefined} onClick={onClick}>
-      {children}
-    </button>
-  );
+function shortGroup(group: string): string {
+  return group.replace(/^group\s+/i, "") || "-";
 }
 
 interface TopicsTableProps {
@@ -33,11 +25,23 @@ interface TopicsTableProps {
   now: number;
   onTogglePin: (topic: ForumTopic) => void;
   onToggleLock: (topic: ForumTopic) => void;
+  onToggleAnswered: (topic: ForumTopic) => void;
+  onToggleNotice: (topic: ForumTopic) => void;
   onMove: (topic: ForumTopic) => void;
   onDelete: (topic: ForumTopic) => void;
 }
 
-export default function TopicsTable({ rows, hasTopics, now, onTogglePin, onToggleLock, onMove, onDelete }: TopicsTableProps) {
+export default function TopicsTable({
+  rows,
+  hasTopics,
+  now,
+  onTogglePin,
+  onToggleLock,
+  onToggleAnswered,
+  onToggleNotice,
+  onMove,
+  onDelete,
+}: TopicsTableProps) {
   if (!rows.length) {
     return <div className={styles.empty}>{hasTopics ? "No topics match these filters." : "No topics yet. Start one with New Topic."}</div>;
   }
@@ -51,6 +55,9 @@ export default function TopicsTable({ rows, hasTopics, now, onTogglePin, onToggl
           </th>
           <th scope="col" className={styles.colAuthor}>
             Created By
+          </th>
+          <th scope="col" className={styles.colGroup}>
+            Group
           </th>
           <th scope="col" className={styles.colReplies}>
             Replies
@@ -71,7 +78,7 @@ export default function TopicsTable({ rows, hasTopics, now, onTogglePin, onToggl
       </thead>
       <tbody>
         {rows.map((t) => {
-          const status = statusOf(t);
+          const status = displayStatus(t);
           return (
             <tr key={t.id} className={styles.row}>
               <th scope="row" className={`${styles.cell} ${styles.topic}`}>
@@ -80,6 +87,9 @@ export default function TopicsTable({ rows, hasTopics, now, onTogglePin, onToggl
               <td className={styles.cell} data-label="Created By">
                 {t.createdBy}
               </td>
+              <td className={styles.cell} data-label="Group" title={t.group}>
+                {shortGroup(t.group)}
+              </td>
               <td className={styles.cell} data-label="Replies">
                 {t.replies ? pad2(t.replies) : "0"}
               </td>
@@ -87,29 +97,26 @@ export default function TopicsTable({ rows, hasTopics, now, onTogglePin, onToggl
                 <time dateTime={t.lastActivityAt}>{timeAgo(t.lastActivityAt, now)}</time>
               </td>
               <td className={styles.cell} data-label="Status">
-                <span className={styles.status} data-status={status}>
+                <span className={styles.status} data-status={status.key}>
                   <span className={styles.dot} />
-                  {STATUS_LABEL[status]}
+                  {status.label}
                 </span>
               </td>
               <td className={styles.cell} data-label="Participation">
                 {t.participation ? PARTICIPATION[t.participation] : "-"}
               </td>
               <td className={`${styles.cell} ${styles.actionsCell}`}>
-                <div className={styles.actions}>
-                  <IconButton label="Pin topic" context={t.title} pressed={t.isPinned} onClick={() => onTogglePin(t)}>
-                    <PinIcon />
-                  </IconButton>
-                  <IconButton label="Lock topic" context={t.title} pressed={t.isLocked} onClick={() => onToggleLock(t)}>
-                    <LockKeyholeIcon />
-                  </IconButton>
-                  <IconButton label="Move topic" context={t.title} onClick={() => onMove(t)}>
-                    <MoveIcon />
-                  </IconButton>
-                  <IconButton label="Delete topic" context={t.title} danger onClick={() => onDelete(t)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
+                <ChoiceMenu
+                  title={t.title}
+                  items={[
+                    { key: "pin", label: "Pin/ unpin", checked: t.isPinned, onSelect: () => onTogglePin(t) },
+                    { key: "lock", label: "Lock/unlock", checked: t.isLocked, onSelect: () => onToggleLock(t) },
+                    { key: "answered", label: "Answered", checked: t.state === "answered", onSelect: () => onToggleAnswered(t) },
+                    { key: "move", label: "Move", onSelect: () => onMove(t) },
+                    { key: "notice", label: "Notice", checked: t.state === "notice", onSelect: () => onToggleNotice(t) },
+                    { key: "delete", label: "Delete", onSelect: () => onDelete(t) },
+                  ]}
+                />
               </td>
             </tr>
           );

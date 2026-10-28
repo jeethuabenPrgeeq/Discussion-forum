@@ -20,6 +20,7 @@ export interface ComposerHandle {
 export interface ComposerPayload {
   html: string;
   attachments: ForumAttachment[];
+  files: File[];
   notify: boolean;
 }
 
@@ -28,8 +29,9 @@ interface ReplyComposerProps {
   mode: ComposerMode;
   topicId: string;
   locked: boolean;
+  viewer?: boolean;
   onCancel: () => void;
-  onSubmit: (payload: ComposerPayload) => void;
+  onSubmit: (payload: ComposerPayload) => void | boolean | Promise<boolean | void>;
   onToast: (message: string) => void;
 }
 
@@ -41,13 +43,14 @@ function bannerFor(mode: ComposerMode) {
   return mode.target ? `Replying to ${mode.target.author.name}` : null;
 }
 
-export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, onSubmit, onToast }: ReplyComposerProps) {
+export default function ReplyComposer({ ref, mode, topicId, locked, viewer = false, onCancel, onSubmit, onToast }: ReplyComposerProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const editorRef = useRef<RichTextEditorHandle>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [attachKey, setAttachKey] = useState(0);
   const [notify, setNotify] = useState(true);
   const [empty, setEmpty] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const isEdit = mode.type === 'edit';
   const editBody = mode.type === 'edit' ? mode.post.body : null;
   const banner = bannerFor(mode);
@@ -72,18 +75,24 @@ export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, on
     } catch {}
   }, [editBody, topicId]);
 
-  const submit = () => {
+  const submit = async () => {
     const editor = editorRef.current;
-    if (!editor || editor.isEmpty()) return;
+    if (!editor || editor.isEmpty() || submitting) return;
     const html = DOMPurify.sanitize(editor.getHTML(), { USE_PROFILES: { html: true } });
-    onSubmit({ html, attachments: files.map((f) => ({ name: f.name, size: f.size })), notify });
-    editor.clear();
-    setFiles([]);
-    setAttachKey((k) => k + 1);
-    if (!isEdit) {
-      try {
-        window.localStorage.removeItem(draftKey(topicId));
-      } catch {}
+    setSubmitting(true);
+    try {
+      const ok = await onSubmit({ html, attachments: files.map((f) => ({ name: f.name, size: f.size })), files, notify });
+      if (ok === false) return;
+      editor.clear();
+      setFiles([]);
+      setAttachKey((k) => k + 1);
+      if (!isEdit) {
+        try {
+          window.localStorage.removeItem(draftKey(topicId));
+        } catch {}
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -96,8 +105,10 @@ export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, on
     }
   };
 
+  const submitLabel = submitting ? (files.length ? 'Uploading…' : 'Posting…') : isEdit ? 'Update' : 'Post';
+
   return (
-    <section ref={sectionRef} className={styles.composer} aria-labelledby="composer-title">
+    <section ref={sectionRef} id="reply" className={styles.composer} aria-labelledby="composer-title">
       <h3 id="composer-title" className={styles.heading}>
         {isEdit ? 'Edit Post' : 'Your Reply'}
       </h3>
@@ -112,7 +123,9 @@ export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, on
       )}
 
       {locked ? (
-        <p className={styles.locked}>This topic is locked. Unlock it from Actions to allow new replies.</p>
+        <p className={styles.locked}>
+          {viewer ? "This topic is locked. You can read the discussion but can't reply." : 'This topic is locked. Unlock it from Actions to allow new replies.'}
+        </p>
       ) : (
         <>
           <RichTextEditor
@@ -120,19 +133,14 @@ export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, on
             label={isEdit ? 'Edit post' : 'Your reply'}
             placeholder="Say something sharp......"
             onEmptyChange={setEmpty}
-            onSubmitShortcut={submit}
+            onSubmitShortcut={() => void submit()}
           />
 
           <div className={styles.footer}>
             <div className={styles.left}>
-              <AttachDropzone key={attachKey} compact onChange={setFiles} />
+              {!isEdit && <AttachDropzone key={attachKey} compact onChange={setFiles} />}
               <label className={styles.notify}>
-                <input
-                  type="checkbox"
-                  className={styles.checkInput}
-                  checked={notify}
-                  onChange={(e) => setNotify(e.target.checked)}
-                />
+                <input type="checkbox" className={styles.checkInput} checked={notify} onChange={(e) => setNotify(e.target.checked)} />
                 <span className={styles.checkBox} aria-hidden="true">
                   <span className={styles.checkMark}>
                     <Check size={12} strokeWidth={3} />
@@ -144,16 +152,16 @@ export default function ReplyComposer({ ref, mode, topicId, locked, onCancel, on
 
             <div className={styles.right}>
               {isEdit ? (
-                <button type="button" className={styles.secondary} onClick={onCancel}>
+                <button type="button" className={styles.secondary} onClick={onCancel} disabled={submitting}>
                   Cancel
                 </button>
               ) : (
-                <button type="button" className={styles.secondary} onClick={saveDraft}>
+                <button type="button" className={styles.secondary} onClick={saveDraft} disabled={submitting}>
                   Save Draft
                 </button>
               )}
-              <button type="button" className={styles.primary} onClick={submit} disabled={empty}>
-                {isEdit ? 'Update' : 'Post'}
+              <button type="button" className={styles.primary} onClick={() => void submit()} disabled={empty || submitting}>
+                {submitLabel}
               </button>
             </div>
           </div>

@@ -6,11 +6,12 @@ import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 import DropdownMenu from "@/components/ui/DropdownMenu";
 import ProgressMeter from "@/features/forum/ui/ProgressMeter";
 import StatusPill from "@/features/forum/ui/StatusPill";
-import { useForum } from "@/features/forum/lib/store";
 import { PERSON_STATUS_META, displayName, formatShortDate, fullName, progressOf } from "@/features/forum/lib/people";
 import { topicHref } from "@/features/forum/lib/routes";
 import type { ForumPerson, ForumSettings, PostsSort } from "@/features/forum/lib/types";
 import styles from "./PeopleTable.module.css";
+import Toast, { useToast } from "@/components/toast/Toast";
+import PersonActions from "@/features/forum/people/PersonActions/PersonActions";
 
 interface PeopleTableProps {
   weekId: string;
@@ -23,11 +24,14 @@ interface PeopleTableProps {
   emptyMessage: ReactNode;
 }
 
+const COLUMN_COUNT = 8;
 const NEXT_SORT: Record<PostsSort, PostsSort> = { none: "desc", desc: "asc", asc: "none" };
 const ARIA_SORT = { none: "none", desc: "descending", asc: "ascending" } as const;
 
+const shortGroup = (group: string | null) => (group ? group.replace(/^group\s+/i, "") : "-");
+
 export default function PeopleTable({ weekId, people, settings, postsSort, onPostsSortChange, onExport, onRemindNotStarted, emptyMessage }: PeopleTableProps) {
-  const { updatePerson, removePerson } = useForum();
+  const toast = useToast();
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
 
   const toggle = (id: string) =>
@@ -43,6 +47,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
       <table className={styles.table}>
         <colgroup>
           <col className={styles.colName} />
+          <col className={styles.colGroup} />
           <col className={styles.colMeter} />
           <col className={styles.colMeter} />
           <col className={styles.colStatus} />
@@ -53,6 +58,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
         <thead>
           <tr>
             <th scope="col">Learners</th>
+            <th scope="col">Group</th>
             <th scope="col">Topics Started</th>
             <th scope="col">Replies made</th>
             <th scope="col">Progress</th>
@@ -84,7 +90,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
         {people.length === 0 ? (
           <tbody>
             <tr>
-              <td colSpan={7} className={styles.empty}>
+              <td colSpan={COLUMN_COUNT} className={styles.empty}>
                 {emptyMessage}
               </td>
             </tr>
@@ -109,6 +115,9 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
                     )}
                     {!p.canPost && <span className={styles.tag}>Posting off</span>}
                   </th>
+                  <td data-label="Group" className={styles.groupCell} title={p.group ?? "No group"}>
+                    {shortGroup(p.group)}
+                  </td>
                   <td data-label="Topics started">
                     <ProgressMeter value={progress.topics} total={progress.topicsRequired} label="topics" />
                   </td>
@@ -130,41 +139,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
                     </button>
                   </td>
                   <td data-label="Actions">
-                    <DropdownMenu
-                      label={`Actions for ${fullName(p)}`}
-                      triggerClassName={styles.pill}
-                      trigger={
-                        <>
-                          Choose <ChevronDown size={20} strokeWidth={1.5} aria-hidden />
-                        </>
-                      }
-                      items={[
-                        {
-                          key: "message",
-                          label: "Message",
-                          onSelect: () => {
-                            window.location.href = `mailto:${p.email}`;
-                          },
-                        },
-                        {
-                          key: "remind",
-                          label: p.reminder ? "Turn reminder off" : "Send reminder",
-                          onSelect: () => updatePerson(weekId, p.id, { reminder: !p.reminder }),
-                        },
-                        {
-                          key: "posting",
-                          label: p.canPost ? "Block posting" : "Allow posting",
-                          onSelect: () => updatePerson(weekId, p.id, { canPost: !p.canPost }),
-                        },
-                        {
-                          key: "remove",
-                          label: "Remove from forum",
-                          onSelect: () => {
-                            if (window.confirm(`Remove ${fullName(p)} from this week?`)) removePerson(weekId, p.id);
-                          },
-                        },
-                      ]}
-                    />
+                    <PersonActions weekId={weekId} person={p} settings={settings} triggerClassName={styles.pill} onNotify={toast.show} />
                   </td>
                 </tr>
 
@@ -173,7 +148,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
                     const counted = post.words >= settings.minWords;
                     return (
                       <tr key={post.id} id={`post-row-${post.id}`} className={styles.postRow}>
-                        <td colSpan={7}>
+                        <td colSpan={COLUMN_COUNT}>
                           <div className={styles.post}>
                             <span className={styles.postTitle}>
                               <span className={styles.kind} data-kind={post.kind}>
@@ -184,7 +159,9 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
                             <span className={styles.postMeta}>
                               <span className={styles.metaItem}>{formatShortDate(post.createdAt)}</span>
                               <span className={styles.metaItem}>{post.words} words</span>
-                              <StatusPill tone={counted ? 'green' : 'orange'} size="xs">{counted ? "Counted" : `Under ${settings.minWords}`}</StatusPill>
+                              <StatusPill tone={counted ? "green" : "orange"} size="xs">
+                                {counted ? "Counted" : `Under ${settings.minWords}`}
+                              </StatusPill>
                               <Link href={topicHref(post.topicId)} className={styles.open}>
                                 Open <ChevronRight size={16} strokeWidth={1.25} aria-hidden />
                               </Link>
@@ -199,6 +176,7 @@ export default function PeopleTable({ weekId, people, settings, postsSort, onPos
           })
         )}
       </table>
+      <Toast message={toast.message} />
     </div>
   );
 }

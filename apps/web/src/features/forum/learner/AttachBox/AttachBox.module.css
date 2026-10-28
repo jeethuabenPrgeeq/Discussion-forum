@@ -1,0 +1,130 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.attach {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 425px;
+  max-width: 100%;
+  min-height: 56px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  border: 1px dashed #9a9a9a;
+  border-radius: 8px;
+}
+
+.attachBtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100px;
+  height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: #dfe6e9;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c4c4c4;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: #2f3547;
+  cursor: pointer;
+}
+
+.attachBtn:active:not(:disabled) {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+}
+
+.attachBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.attachBtn:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.rule {
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 0.03em;
+  color: #374151;
+}
+
+.fileList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fileChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 260px;
+  height: 42px;
+  padding: 0 8px 0 14px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #dfe6e9;
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #2d4cc8;
+}
+
+.fileRemove {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #7f7c7c;
+  cursor: pointer;
+}
+
+.fileRemove:hover {
+  color: #c0122e;
+}
+
+.fileRemove:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: #c0122e;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

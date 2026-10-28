@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import Select from '@/components/form/Select';
 import { DownloadIcon } from '@/components/icons';
+import { ExportDialog, type ExportOptions } from '@/features/forum/ui/ExportDialog/ExportDialog';
 import { SORT_OPTIONS, TOPIC_FILTER_OPTIONS } from '@/features/forum/lib/options';
 import type { TopicFilters } from '@/features/forum/lib/types';
 import styles from './TopicsToolbar.module.css';
@@ -11,11 +13,12 @@ interface TopicsToolbarProps {
   filters: TopicFilters;
   groups: string[];
   onChange: (next: Partial<TopicFilters>) => void;
-  onExport: () => void;
+  onExport: (options: ExportOptions) => void;
   onNewTopic: () => void;
 }
 
 export default function TopicsToolbar({ filters, groups, onChange, onExport, onNewTopic }: TopicsToolbarProps) {
+  const [exportOpen, setExportOpen] = useState(false);
   const groupOptions = [{ value: 'all', label: 'All Groups' }, ...groups.map((g) => ({ value: g, label: g }))];
 
   return (
@@ -59,7 +62,7 @@ export default function TopicsToolbar({ filters, groups, onChange, onExport, onN
       </div>
 
       <div className={styles.actions}>
-        <button type="button" className={styles.export} onClick={onExport}>
+        <button type="button" className={styles.export} onClick={() => setExportOpen(true)}>
           <DownloadIcon />
           Export
         </button>
@@ -68,6 +71,10 @@ export default function TopicsToolbar({ filters, groups, onChange, onExport, onN
           New Topic
         </button>
       </div>
+
+      {exportOpen && (
+        <ExportDialog groups={groups} onClose={() => setExportOpen(false)} onExport={onExport} />
+      )}
     </div>
   );
 }

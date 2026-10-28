@@ -1,0 +1,65 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 32px;
+  background: #dfe6e9;
+  border-radius: 8px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #374151;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.save {
+  width: 124px;
+  height: 48px;
+  border: 0;
+  border-radius: 24px;
+  background: #dfe6e9;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 8px #c4c4c4;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #2d4cc8;
+  cursor: pointer;
+}
+
+.save:active {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 4px #c4c4c4;
+}
+
+.save:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 24px;
+  }
+}

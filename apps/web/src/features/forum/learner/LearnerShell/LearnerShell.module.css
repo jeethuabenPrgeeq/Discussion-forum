@@ -1,0 +1,89 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.due {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border: 0.8px solid #c05512;
+  border-radius: 36px;
+  background: #e5e1de;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #c05512;
+  white-space: nowrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 64px;
+  padding: 0 4px;
+  border-radius: 4px;
+  box-shadow: inset 0 -4px 0 #d0d8dc;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  padding: 0 4px 20px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab[aria-selected="true"] {
+  font-weight: 700;
+  color: #2d4cc8;
+}
+
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 8px;
+  border-radius: 32px;
+  background: #2d4cc8;
+}
+
+.tab:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.placeholder {
+  padding: 48px 24px;
+  border-radius: 16px;
+  background: #dfe6e9;
+  box-shadow: inset -2px -2px 4px #ffffff, inset 2px 2px 4px #c4c4c4;
+  text-align: center;
+  font-size: 16px;
+  color: #7f7c7c;
+}
+
+@media (max-width: 640px) {
+  .tabs {
+    gap: 32px;
+  }
+
+  .tab {
+    font-size: 17px;
+  }
+}

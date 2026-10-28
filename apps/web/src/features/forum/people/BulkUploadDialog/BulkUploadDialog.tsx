@@ -13,10 +13,12 @@ import { createPortal } from 'react-dom';
 import { FileText, X } from 'lucide-react';
 import Checkbox from '@/components/form/Checkbox';
 import { SelectField } from '@/components/form/FormFields';
+import ConfirmDialog from '@/components/ui/ConfirmDialog/ConfirmDialog';
+import { api, ApiError } from '@/features/forum/lib/api';
 import { useForum } from '@/features/forum/lib/store';
-import { createPerson, groupFromOption, parsePeopleCsv, type ParsedPeople } from '@/features/forum/lib/people';
+import { groupFromOption, parsePeopleCsv, type ParsedPeople } from '@/features/forum/lib/people';
 import { BULK_ACTION_OPTIONS, GROUP_OPTIONS, ROLE_OPTIONS } from '@/features/forum/lib/options';
-import type { BulkAction, ForumPerson, PersonRole } from '@/features/forum/lib/types';
+import type { BulkAction, PersonRole } from '@/features/forum/lib/types';
 import styles from './BulkUploadDialog.module.css';
 
 export interface BulkResult {
@@ -26,6 +28,10 @@ export interface BulkResult {
   skipped: number;
 }
 
+interface ApiBulkResult extends BulkResult {
+  errors: string[];
+}
+
 interface BulkUploadDialogProps {
   onClose: () => void;
   onComplete: (result: BulkResult) => void;
@@ -33,11 +39,12 @@ interface BulkUploadDialogProps {
 
 const MAX_BYTES = 1024 * 1024;
 const MAX_ERRORS_SHOWN = 5;
+const BATCH_SIZE = 500;
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDialogProps) {
-  const { weekId, peopleFor, settingsFor, addPeople, updatePerson, removePerson } = useForum();
+  const { weekId, peopleFor, forumIdFor, loadPeople } = useForum();
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -51,6 +58,8 @@ export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDial
   const [dragging, setDragging] = useState(false);
   const [emailInvites, setEmailInvites] = useState(true);
   const [skipExisting, setSkipExisting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -64,15 +73,13 @@ export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDial
   }, []);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape' && !e.defaultPrevented) {
+    if (e.key === 'Escape' && !e.defaultPrevented && !confirmOpen && !uploading) {
       e.preventDefault();
       onClose();
       return;
     }
     if (e.key !== 'Tab' || !panelRef.current) return;
-    const nodes = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-      (n) => n.offsetParent !== null,
-    );
+    const nodes = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((n) => n.offsetParent !== null);
     if (!nodes.length) return;
     const first = nodes[0];
     const last = nodes[nodes.length - 1];
@@ -122,50 +129,60 @@ export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDial
     if (file) void readFile(file);
   };
 
-  const upload = () => {
-    if (!parsed?.rows.length) return;
-    if (action === 'remove' && !window.confirm(`Remove up to ${parsed.rows.length} people from this week?`)) return;
-
-    const settings = settingsFor(weekId);
-    const existing = new Map(peopleFor(weekId).map((p) => [p.email, p]));
-    const result: BulkResult = { added: 0, updated: 0, removed: 0, skipped: 0 };
-    const additions: ForumPerson[] = [];
-
-    for (const row of parsed.rows) {
-      const match = existing.get(row.email);
-      if (action === 'remove') {
-        if (match) {
-          removePerson(weekId, match.id);
-          result.removed += 1;
-        } else result.skipped += 1;
-        continue;
-      }
-      const nextRole = row.role ?? role;
-      const nextGroup = row.group === undefined ? groupFromOption(group) : row.group;
-      if (match) {
-        if (action === 'add' && skipExisting) {
-          result.skipped += 1;
-          continue;
-        }
-        updatePerson(weekId, match.id, { role: nextRole, group: nextGroup });
-        result.updated += 1;
-        continue;
-      }
-      if (action === 'update') {
-        result.skipped += 1;
-        continue;
-      }
-      additions.push(
-        createPerson(
-          { firstName: row.firstName, lastName: row.lastName, email: row.email, role: nextRole, group: nextGroup },
-          settings,
-        ),
-      );
-      result.added += 1;
+  const runUpload = async () => {
+    if (!parsed?.rows.length || uploading) return;
+    const forumId = forumIdFor(weekId);
+    if (!forumId) {
+      setFileError("The forum hasn't loaded yet. Refresh and try again.");
+      return;
     }
 
-    if (additions.length) addPeople(weekId, additions);
-    onComplete(result);
+    const enrolled = new Set(peopleFor(weekId).map((p) => p.email.toLowerCase()));
+    const rows = parsed.rows.map((row) => {
+      const nextRole = row.role ?? role;
+      const email = row.email.toLowerCase();
+      const rowAction = action === 'add' && !skipExisting && enrolled.has(email) ? 'update' : action;
+      return {
+        action: rowAction,
+        firstName: row.firstName,
+        lastName: row.lastName,
+        email,
+        role: nextRole === 'observer' ? 'observer' : 'learner',
+        group: row.group === undefined ? groupFromOption(group) : row.group,
+      };
+    });
+
+    setUploading(true);
+    setFileError(null);
+    const total: ApiBulkResult = { added: 0, updated: 0, removed: 0, skipped: 0, errors: [] };
+
+    try {
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const result = await api<ApiBulkResult>(`/forums/${forumId}/people/bulk`, {
+          method: 'POST',
+          json: { rows: rows.slice(i, i + BATCH_SIZE), sendInvites: emailInvites },
+        });
+        total.added += result.added;
+        total.updated += result.updated;
+        total.removed += result.removed;
+        total.skipped += result.skipped;
+        total.errors.push(...result.errors);
+      }
+      await loadPeople(weekId, true);
+      if (total.errors.length) console.info('[bulk-upload] skipped rows', total.errors);
+      onComplete({ added: total.added, updated: total.updated, removed: total.removed, skipped: total.skipped });
+    } catch (error) {
+      setFileError(error instanceof ApiError ? error.message : 'Upload failed. Check that the API is running and try again.');
+      setUploading(false);
+    }
+  };
+
+  const upload = () => {
+    if (action === 'remove') {
+      setConfirmOpen(true);
+      return;
+    }
+    void runUpload();
   };
 
   const hiddenErrors = (parsed?.errors.length ?? 0) - MAX_ERRORS_SHOWN;
@@ -174,17 +191,10 @@ export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDial
     <div
       className={styles.overlay}
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !uploading) onClose();
       }}
     >
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className={styles.dialog}
-        onKeyDown={onKeyDown}
-      >
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className={styles.dialog} onKeyDown={onKeyDown}>
         <h2 id={titleId} className={styles.title}>
           Bulk upload people
         </h2>
@@ -257,28 +267,35 @@ export default function BulkUploadDialog({ onClose, onComplete }: BulkUploadDial
 
         <div className={styles.options}>
           <Checkbox label="Email invites to new people" checked={emailInvites} onChange={setEmailInvites} />
-          <Checkbox
-            label="Skip people already enrolled"
-            checked={skipExisting}
-            onChange={setSkipExisting}
-            disabled={action !== 'add'}
-          />
+          <Checkbox label="Skip people already enrolled" checked={skipExisting} onChange={setSkipExisting} disabled={action !== 'add'} />
         </div>
 
         <div className={styles.footer}>
-          <button type="button" className={styles.btn} onClick={onClose}>
+          <button type="button" className={styles.btn} onClick={onClose} disabled={uploading}>
             Cancel
           </button>
           <button
             type="button"
             className={`${styles.btn} ${styles.submit}`}
-            disabled={!parsed?.rows.length}
+            disabled={!parsed?.rows.length || uploading}
             onClick={upload}
           >
-            Upload
+            {uploading ? 'Uploading…' : 'Upload'}
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Remove people?"
+        message={`Remove up to ${parsed?.rows.length ?? 0} people from this week's forum? This can't be undone.`}
+        confirmLabel="Remove"
+        onConfirm={() => {
+          setConfirmOpen(false);
+          void runUpload();
+        }}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>,
     document.body,
   );

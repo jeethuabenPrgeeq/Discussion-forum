@@ -241,6 +241,7 @@ export default function GradesView() {
               <tr>
                 <th scope="col">Student Id</th>
                 <th scope="col">Participant</th>
+                <th scope="col">Group</th>
                 <th scope="col">Discussion Topic</th>
                 <th scope="col" className={styles.center}>Peers Replies</th>
                 <th scope="col" className={styles.center}>Total marks</th>
@@ -251,7 +252,7 @@ export default function GradesView() {
             <tbody>
               {visible.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className={styles.empty}>
+                  <td colSpan={8} className={styles.empty}>
                     No participants match these filters.
                   </td>
                 </tr>
@@ -273,6 +274,9 @@ export default function GradesView() {
                         </span>
                         {displayName(person)}
                       </th>
+                      <td data-label="Group" className={styles.group}>
+                        {person.group || '-'}
+                      </td>
                       <td data-label="Discussion Topic" className={styles.topic}>
                         {week.forumTitle}
                       </td>

@@ -1,0 +1,185 @@
+.dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: none;
+  color: var(--text-strong);
+}
+
+.dialog[open] {
+  animation: pop 0.18s ease-out;
+}
+
+.dialog::backdrop {
+  background: rgba(36, 44, 60, 0.35);
+  backdrop-filter: blur(2px);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+}
+
+.description {
+  margin: -8px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--text-muted);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.option:has(.radioInput:checked) {
+  box-shadow: var(--inset-sm);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.option:has(.radioInput:focus-visible) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.radioInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radio {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--inset-sm);
+}
+
+.radioInput:checked + .radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.optionLabel {
+  flex: 1;
+}
+
+.current {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.cancel,
+.confirm {
+  flex: 1;
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.cancel {
+  color: var(--text-strong);
+}
+
+.confirm {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.cancel:active,
+.confirm:active {
+  box-shadow: var(--inset-sm);
+}
+
+.cancel:focus-visible,
+.confirm:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: var(--raised-sm);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open] {
+    animation: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .body {
+    padding: 20px 16px 16px;
+  }
+  .actions {
+    gap: 12px;
+  }
+}

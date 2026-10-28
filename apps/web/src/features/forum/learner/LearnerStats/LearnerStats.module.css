@@ -1,0 +1,66 @@
+.stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.stat {
+  min-height: 90px;
+  padding: 12px 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  background: #dfe6e9;
+  border-radius: 8px;
+  box-shadow: -4px -4px 8px #ffffff, 4px 4px 8px rgba(196, 196, 196, 0.8);
+}
+
+.label {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #2f3547;
+}
+
+.value {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.blue {
+  color: #2d4cc8;
+}
+
+.purple {
+  color: #67096e;
+}
+
+.green {
+  color: #2a7308;
+}
+
+.orange {
+  color: #c05512;
+}
+
+@media (max-width: 1200px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

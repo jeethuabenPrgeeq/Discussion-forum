@@ -1,0 +1,82 @@
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border-radius: 8px;
+  background: #dfe6e9;
+  box-shadow: -4px -4px 8px #ffffff, 4px 4px 8px #c4c4c4;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.field:focus-within {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 8px 0 24px;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+  color: #374151;
+}
+
+.input::placeholder {
+  color: #7f7c7c;
+}
+
+.arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 16px;
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2f3547;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.arrow svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arrow:hover:not(:disabled) {
+  color: #2d4cc8;
+}
+
+.arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.disabled {
+  opacity: 0.6;
+}
+
+.disabled .input {
+  cursor: not-allowed;
+}

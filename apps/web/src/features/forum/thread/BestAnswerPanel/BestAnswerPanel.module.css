@@ -1,0 +1,175 @@
+.panel {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+}
+
+.title svg {
+  color: var(--orange);
+}
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.points li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.points li::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+}
+
+.selectWrap {
+  position: relative;
+}
+
+.select {
+  width: 100%;
+  height: 44px;
+  padding: 0 44px 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--inset-sm);
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+  appearance: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: var(--inset-sm), inset 0 0 0 1px rgba(45, 76, 200, 0.35);
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--text-strong);
+  pointer-events: none;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.cancel,
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--raised-sm);
+  font-family: inherit;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.cancel {
+  color: var(--text-strong);
+}
+
+.confirm {
+  font-weight: 600;
+  color: var(--green);
+}
+
+.cancel:active,
+.confirm:active {
+  box-shadow: var(--inset-sm);
+}
+
+.cancel:focus-visible,
+.confirm:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 599px) {
+  .panel {
+    grid-column: 1 / -1;
+    margin-top: 14px;
+    padding: 16px;
+  }
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .points li {
+    font-size: 14px;
+  }
+  .footer {
+    gap: 12px;
+  }
+  .cancel,
+  .confirm {
+    flex: 1;
+  }
+}

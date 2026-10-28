@@ -63,7 +63,7 @@ const TREE_TOPICS: ForumTopic[] = SEED.map(
     isLocked,
     participation,
     group: GROUPS[i % GROUPS.length],
-    isUnread: i % 4 === 1,
+    isUnread: state === 'notice' || i % 4 === 1,
     reportCount: i === 3 || i === 10 ? 1 : 0,
   }),
 );

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { X } from 'lucide-react';
 import {
   BellIcon,
@@ -16,6 +16,7 @@ import {
   UserMultipleIcon,
   type IconComponent,
 } from '@/components/icons';
+import { LOGIN_PATH, clearSessionCookie } from '@/features/auth/lib/session';
 import styles from "./Sidebar.module.css";
 
 interface NavItem {
@@ -44,6 +45,15 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, mobileOpen, onCloseMobile, onLogout }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const logout = () => {
+    onLogout?.();
+    onCloseMobile();
+    clearSessionCookie();
+    router.replace(LOGIN_PATH);
+    router.refresh();
+  };
 
   return (
     <aside id="app-sidebar" className={styles.sidebar} data-collapsed={collapsed || undefined} data-open={mobileOpen || undefined} aria-label="Main navigation">
@@ -70,7 +80,7 @@ export default function Sidebar({ collapsed, mobileOpen, onCloseMobile, onLogout
         })}
       </nav>
 
-      <button type="button" className={`${styles.item} ${styles.logout}`} onClick={onLogout} title={collapsed ? "Logout" : undefined}>
+      <button type="button" className={`${styles.item} ${styles.logout}`} onClick={logout} title={collapsed ? "Logout" : undefined}>
         <LogOutIcon className={styles.icon} />
         <span className={styles.label}>Logout</span>
       </button>

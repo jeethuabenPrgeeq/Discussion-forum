@@ -1,0 +1,369 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CREATOR
+  LEARNER
+}
+
+enum EnrollmentRole {
+  LEARNER
+  AUDITOR
+}
+
+enum TopicState {
+  OPEN
+  ANSWERED
+  NOTICE
+}
+
+enum Participation {
+  REQUIRED
+  OPTIONAL
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+}
+
+enum ReportDecision {
+  DISMISS
+  HIDE
+  REMOVE_WARN
+  REMOVE_DEDUCT
+}
+
+enum FeedbackRating {
+  GREAT
+  GOOD
+  NEEDS_WORK
+}
+
+enum QuestionStatus {
+  AWAITING
+  ANSWERED
+}
+
+enum ReminderTiming {
+  NOW
+  TOMORROW
+  DEADLINE
+}
+
+enum EvaluationStatus {
+  PENDING
+  DRAFT
+  EVALUATED
+  PUBLISHED
+}
+
+model User {
+  id                  String            @id @default(cuid())
+  email               String            @unique
+  passwordHash        String
+  firstName           String
+  lastName            String
+  role                Role
+  createdAt           DateTime          @default(now())
+  forums              Forum[]
+  enrollments         Enrollment[]
+  topics              Topic[]
+  posts               Post[]            @relation("PostAuthor")
+  editedPosts         Post[]            @relation("PostEditor")
+  reports             Report[]          @relation("Reporter")
+  resolved            Report[]          @relation("Resolver")
+  feedbackGiven       PostFeedback[]
+  questionsAsked      Question[]        @relation("Asker")
+  questionsToAnswer   Question[]        @relation("Evaluator")
+  sentMessages        PersonMessage[]   @relation("MessageSender")
+  inbox               PersonMessage[]   @relation("MessageRecipient")
+  sentReminders       Reminder[]        @relation("ReminderSender")
+  reminders           Reminder[]        @relation("ReminderRecipient")
+  evaluationsReceived Evaluation[]      @relation("EvaluationLearner")
+  evaluationsGiven    Evaluation[]      @relation("EvaluationEvaluator")
+  attachments         Attachment[]
+  topicReads          TopicRead[]
+  notifications       Notification[]
+  alertPreferences    AlertPreference[]
+}
+
+model Forum {
+  id               String            @id @default(cuid())
+  ownerId          String
+  course           String
+  title            String
+  weekLabel        String
+  position         Int
+  settings         Json              @default("{}")
+  createdAt        DateTime          @default(now())
+  owner            User              @relation(fields: [ownerId], references: [id])
+  enrollments      Enrollment[]
+  topics           Topic[]
+  questions        Question[]
+  messages         PersonMessage[]
+  reminders        Reminder[]
+  evaluations      Evaluation[]
+  alertPreferences AlertPreference[]
+
+  @@index([ownerId, position])
+}
+
+model Enrollment {
+  id         String         @id @default(cuid())
+  forumId    String
+  userId     String
+  role       EnrollmentRole @default(LEARNER)
+  group      String?
+  canPost    Boolean        @default(true)
+  remindedAt DateTime?
+  warnings   Int            @default(0)
+  deductions Int            @default(0)
+  forum      Forum          @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([forumId, userId])
+  @@index([userId])
+}
+
+model Topic {
+  id             String         @id @default(cuid())
+  forumId        String
+  authorId       String
+  title          String
+  group          String?
+  state          TopicState     @default(OPEN)
+  isPinned       Boolean        @default(false)
+  isLocked       Boolean        @default(false)
+  participation  Participation?
+  reportCount    Int            @default(0)
+  createdAt      DateTime       @default(now())
+  lastActivityAt DateTime       @default(now())
+  forum          Forum          @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  author         User           @relation(fields: [authorId], references: [id])
+  posts          Post[]
+  reads          TopicRead[]
+
+  @@index([forumId, isPinned, lastActivityAt])
+}
+
+model TopicRead {
+  userId     String
+  topicId    String
+  lastReadAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([userId, topicId])
+  @@index([topicId])
+}
+
+model Post {
+  id             String        @id @default(cuid())
+  topicId        String
+  authorId       String
+  body           String
+  replyToId      String?
+  isPrivate      Boolean       @default(false)
+  allowReplyBack Boolean       @default(true)
+  isBestAnswer   Boolean       @default(false)
+  bonusMarks     Int?
+  editedAt       DateTime?
+  editedById     String?
+  editReason     String?
+  hideEditTag    Boolean       @default(false)
+  hiddenAt       DateTime?
+  removedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  topic          Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author         User          @relation("PostAuthor", fields: [authorId], references: [id])
+  editedBy       User?         @relation("PostEditor", fields: [editedById], references: [id])
+  replyTo        Post?         @relation("Replies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies        Post[]        @relation("Replies")
+  reports        Report[]
+  feedback       PostFeedback?
+  attachments    Attachment[]
+
+  @@index([topicId, createdAt])
+}
+
+model PostFeedback {
+  id        String         @id @default(cuid())
+  postId    String         @unique
+  authorId  String
+  rating    FeedbackRating
+  criterion String
+  max       Int
+  marks     Float?
+  note      String
+  visible   Boolean        @default(true)
+  updatedAt DateTime       @updatedAt
+  post      Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User           @relation(fields: [authorId], references: [id])
+}
+
+model Report {
+  id           String          @id @default(cuid())
+  number       Int             @unique @default(autoincrement())
+  postId       String
+  reporterId   String
+  reason       String
+  details      String          @default("")
+  status       ReportStatus    @default(PENDING)
+  decision     ReportDecision?
+  note         String?
+  notified     String?
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime        @default(now())
+  post         Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reporter     User            @relation("Reporter", fields: [reporterId], references: [id])
+  resolvedBy   User?           @relation("Resolver", fields: [resolvedById], references: [id])
+  audit        AuditEntry[]
+
+  @@unique([postId, reporterId])
+  @@index([status, createdAt])
+}
+
+model AuditEntry {
+  id        String   @id @default(cuid())
+  reportId  String
+  text      String
+  createdAt DateTime @default(now())
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId, createdAt])
+}
+
+model Question {
+  id          String         @id @default(cuid())
+  number      Int            @unique @default(autoincrement())
+  forumId     String?
+  learnerId   String
+  evaluatorId String
+  type        String
+  about       String
+  part        String?
+  body        String
+  emailMe     Boolean        @default(true)
+  sendCopy    Boolean        @default(false)
+  status      QuestionStatus @default(AWAITING)
+  answer      String?
+  answeredAt  DateTime?
+  createdAt   DateTime       @default(now())
+  forum       Forum?         @relation(fields: [forumId], references: [id], onDelete: SetNull)
+  learner     User           @relation("Asker", fields: [learnerId], references: [id])
+  evaluator   User           @relation("Evaluator", fields: [evaluatorId], references: [id])
+  attachments Attachment[]
+
+  @@index([learnerId, createdAt])
+  @@index([evaluatorId, status])
+}
+
+model PersonMessage {
+  id          String    @id @default(cuid())
+  forumId     String
+  senderId    String
+  recipientId String
+  subject     String
+  body        String
+  emailCopy   Boolean   @default(true)
+  allowReply  Boolean   @default(true)
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+  forum       Forum     @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  sender      User      @relation("MessageSender", fields: [senderId], references: [id])
+  recipient   User      @relation("MessageRecipient", fields: [recipientId], references: [id])
+
+  @@index([recipientId, createdAt])
+}
+
+model Reminder {
+  id           String         @id @default(cuid())
+  forumId      String
+  senderId     String
+  recipientId  String
+  reason       String
+  timing       ReminderTiming
+  message      String
+  email        Boolean        @default(true)
+  inApp        Boolean        @default(true)
+  scheduledFor DateTime
+  sentAt       DateTime?
+  createdAt    DateTime       @default(now())
+  forum        Forum          @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  sender       User           @relation("ReminderSender", fields: [senderId], references: [id])
+  recipient    User           @relation("ReminderRecipient", fields: [recipientId], references: [id])
+
+  @@index([scheduledFor, sentAt])
+}
+
+model Evaluation {
+  id          String           @id @default(cuid())
+  forumId     String
+  learnerId   String
+  evaluatorId String?
+  status      EvaluationStatus @default(PENDING)
+  grade       Float?
+  data        Json             @default("{}")
+  publishedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  forum       Forum            @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  learner     User             @relation("EvaluationLearner", fields: [learnerId], references: [id], onDelete: Cascade)
+  evaluator   User?            @relation("EvaluationEvaluator", fields: [evaluatorId], references: [id], onDelete: SetNull)
+
+  @@unique([forumId, learnerId])
+  @@index([forumId, status])
+}
+
+model Attachment {
+  id         String    @id @default(cuid())
+  postId     String?
+  questionId String?
+  uploaderId String
+  name       String
+  size       Int
+  mime       String
+  path       String
+  createdAt  DateTime  @default(now())
+  post       Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  uploader   User      @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([questionId])
+}
+
+model Notification {
+  id         String    @id @default(cuid())
+  userId     String
+  type       String
+  title      String
+  body       String    @default("")
+  forumId    String?
+  topicId    String?
+  questionId String?
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+}
+
+model AlertPreference {
+  userId    String
+  forumId   String
+  data      Json     @default("{}")
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forum     Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+
+  @@id([userId, forumId])
+}

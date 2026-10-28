@@ -1,26 +1,77 @@
 .toast {
   position: fixed;
+  top: 50%;
   left: 50%;
-  bottom: 24px;
-  z-index: 60;
-  max-width: calc(100vw - 32px);
-  padding: 10px 18px;
-  border-radius: 10px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 14px;
+  z-index: 10050;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 16px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+  background: var(--bg);
   box-shadow: var(--raised-md);
+  color: var(--text-strong);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+  text-align: left;
   opacity: 0;
-  transform: translate(-50%, 16px);
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translate(-50%, -50%) scale(0.96);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
 }
 
 .toast[data-visible] {
   opacity: 1;
-  transform: translate(-50%, 0);
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.content {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.icon {
+  flex: none;
+  margin-top: 1px;
+}
+
+.toast[data-tone='success'] .icon {
+  color: var(--green);
+}
+
+.toast[data-tone='error'] .icon {
+  color: var(--red);
+}
+
+.toast[data-tone='info'] .icon {
+  color: var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { transition: none; }
+  .toast {
+    transition: none;
+  }
+}
+.toast[data-tone='success'] {
+  border: 1.5px solid var(--green);
+}
+
+.toast[data-tone='error'] {
+  border: 1.5px solid var(--red);
+}
+
+.toast[data-tone='info'] {
+  border: 1.5px solid var(--primary);
+}
+
+.text {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

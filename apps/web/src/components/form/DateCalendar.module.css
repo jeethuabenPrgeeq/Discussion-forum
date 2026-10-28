@@ -1,0 +1,376 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10001;
+  width: 342px;
+  max-width: calc(100vw - 32px);
+  transform: translate(-50%, -50%);
+  border-radius: 18px;
+  background: #dfe6e9;
+  box-shadow: 10px 10px 20px #c4c4c4, -10px -10px 20px #ffffff;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.popup button {
+  font-family: inherit;
+}
+
+.popup button:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  color: #2d4cc8;
+  box-shadow: 5px 5px 10px #c4c4c4, -5px -5px 10px #ffffff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.nav:active:not(:disabled) {
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+}
+
+.nav:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.titleRow {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 8px;
+}
+
+.titleButton {
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+  color: #31344b;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.divider {
+  height: 1px;
+  background: #c4c4c4;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dayLabel {
+  color: rgba(49, 52, 75, 0.6);
+  text-align: center;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+  padding: 3px 0;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #31344b;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+.cellRaised {
+  background: #dfe6e9;
+}
+
+.cellRaised:hover {
+  box-shadow: 4px 4px 8px #c4c4c4, -4px -4px 8px #ffffff;
+}
+
+.cellOther {
+  color: rgba(49, 52, 75, 0.3);
+}
+
+.cellToday {
+  color: #186348;
+  font-weight: 700;
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+}
+
+.cellSelected {
+  color: #2d4cc8;
+  font-weight: 700;
+  box-shadow: 3px 3px 6px rgba(45, 76, 200, 0.3), -3px -3px 6px rgba(255, 255, 255, 0.6);
+}
+
+.cellDisabled {
+  color: rgba(49, 52, 75, 0.25);
+  background: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cellSaved {
+  text-decoration: line-through;
+  text-decoration-color: rgba(45, 76, 200, 0.6);
+}
+
+.optionList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-height: 236px;
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.option {
+  min-height: 38px;
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  color: #31344b;
+  box-shadow: 4px 4px 8px #c4c4c4, -4px -4px 8px #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.option:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.optionActive {
+  color: #2d4cc8;
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.timeLabel {
+  color: #31344b;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.timeControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeSelect {
+  appearance: none;
+  width: 52px;
+  height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+  color: #31344b;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  cursor: pointer;
+}
+
+.timeSelect:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.timeSelect option:disabled {
+  color: rgba(49, 52, 75, 0.3);
+}
+
+.timeColon {
+  color: #31344b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.periodGroup {
+  display: flex;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.periodButton {
+  width: 44px;
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  color: #31344b;
+  box-shadow: 4px 4px 8px #c4c4c4, -4px -4px 8px #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.periodActive {
+  color: #2d4cc8;
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+}
+
+.periodButton:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.back {
+  border: 0;
+  background: transparent;
+  color: rgba(49, 52, 75, 0.6);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.today {
+  border: 0;
+  border-radius: 9px;
+  background: #dfe6e9;
+  color: #2d4cc8;
+  box-shadow: 5px 5px 10px rgba(188, 196, 200, 0.9), -5px -5px 10px rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  padding: 7px 18px;
+}
+
+.today:active:not(:disabled) {
+  box-shadow: inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+}
+
+.today:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.set {
+  color: #ffffff;
+  background: #2d4cc8;
+  box-shadow: 4px 4px 8px rgba(45, 76, 200, 0.35), -4px -4px 8px #ffffff;
+}
+
+.set:disabled {
+  background: #dfe6e9;
+  color: rgba(49, 52, 75, 0.5);
+}
+
+.trigger {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #374151;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.trigger svg {
+  pointer-events: none;
+}
+
+.trigger:hover {
+  color: #2d4cc8;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.nativeInput::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+@media (max-width: 380px) {
+  .timeRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

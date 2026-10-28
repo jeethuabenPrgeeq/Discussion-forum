@@ -1,27 +1,28 @@
+import { NotificationsModule } from './notifications/notifications.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
+import { ExportsModule } from './exports/exports.module';
+import { RemindersModule } from './reminders/reminders.module';
+import { EvaluationsModule } from './evaluations/evaluations.module';
+import { MailModule } from './mail/mail.module';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { ForumsModule } from './forums/forums.module';
+import { PeopleModule } from './people/people.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { TopicsModule } from './forum/topics/topics.module';
-import { PostsModule } from './forum/posts/posts.module';
-import { SettingsModule } from './forum/settings/settings.module';
-import { ParticipantsModule } from './forum/participants/participants.module';
-import { GradingModule } from './forum/grading/grading.module';
-import { ReportsModule } from './forum/reports/reports.module';
-import { AccessModule } from './forum/access/access.module';
-import { AlertsModule } from './forum/alerts/alerts.module';
+import { QuestionsModule } from './questions/questions.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
-  imports: [
+  imports: [NotificationsModule, ScheduleModule.forRoot(), UploadsModule, ExportsModule, RemindersModule, MailModule, EvaluationsModule, 
+    ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     AuthModule,
-    TopicsModule,
-    PostsModule,
-    SettingsModule,
-    ParticipantsModule,
-    GradingModule,
+    ForumsModule,
+    PeopleModule,
     ReportsModule,
-    AccessModule,
-    AlertsModule,
+    QuestionsModule,
   ],
 })
 export class AppModule {}

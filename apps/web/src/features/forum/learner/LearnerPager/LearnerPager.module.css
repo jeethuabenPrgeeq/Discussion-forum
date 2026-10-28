@@ -1,0 +1,56 @@
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.showing {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+  color: rgba(49, 52, 75, 0.8);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav,
+.num {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: #dfe6e9;
+  box-shadow: -4px -4px 8px #ffffff, 4px 4px 8px #c6c6c9;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #31344b;
+  cursor: pointer;
+}
+
+.nav:disabled {
+  box-shadow: inset -4px -4px 8px #ffffff, inset 4px 4px 8px rgba(196, 196, 196, 0.8);
+  color: rgba(49, 52, 75, 0.2);
+  cursor: default;
+}
+
+.current {
+  background: #2d4cc8;
+  color: #ffffff;
+}
+
+.nav:focus-visible,
+.num:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}

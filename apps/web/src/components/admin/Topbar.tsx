@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
-import { NotificationIcon } from '@/components/icons';
+import NotificationBell from '@/components/notifications/NotificationBell';
+import { readSessionUser, type SessionUser } from '@/features/auth/lib/session';
 import styles from './Topbar.module.css';
 
 interface TopbarProps {
@@ -14,14 +16,25 @@ interface TopbarProps {
   unread?: number;
 }
 
-export default function Topbar({
-  menuOpen,
-  onOpenMenu,
-  userName = 'Antony Thomas',
-  userRole = 'Institution admin',
-  avatarSrc = '/avatar-antony.png',
-  unread = 1,
-}: TopbarProps) {
+const initialsOf = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('');
+
+export default function Topbar({ menuOpen, onOpenMenu, userName, userRole, avatarSrc }: TopbarProps) {
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    setUser(readSessionUser());
+  }, []);
+
+  const name = userName ?? user?.name ?? '';
+  const role = userRole ?? user?.title ?? '';
+
   return (
     <header className={styles.topbar}>
       <button
@@ -36,22 +49,21 @@ export default function Topbar({
       </button>
 
       <div className={styles.right}>
-        <button
-          type="button"
-          className={styles.bell}
-          aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
-        >
-          <NotificationIcon />
-          {unread > 0 && <span className={styles.dot} />}
-        </button>
+        <NotificationBell buttonClassName={styles.bell} dotClassName={styles.dot} />
 
         <div className={styles.profile}>
           <span className={styles.avatar}>
-            <Image src={avatarSrc} alt="" width={36} height={36} />
+            {avatarSrc ? (
+              <Image src={avatarSrc} alt="" width={36} height={36} />
+            ) : (
+              <span className={styles.initials} data-role={user?.role} aria-hidden>
+                {initialsOf(name)}
+              </span>
+            )}
           </span>
           <span className={styles.who}>
-            <span className={styles.name}>{userName}</span>
-            <span className={styles.role}>{userRole}</span>
+            <span className={styles.name}>{name}</span>
+            <span className={styles.role}>{role}</span>
           </span>
         </div>
       </div>

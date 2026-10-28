@@ -54,7 +54,7 @@ export default function AttachDropzone({ compact, onChange }: AttachDropzoneProp
 
   return (
     <div className={styles.wrap}>
-            <div
+      <div
         className={styles.zone}
         data-compact={compact || undefined}
         data-dragging={dragging || undefined}
@@ -90,10 +90,10 @@ export default function AttachDropzone({ compact, onChange }: AttachDropzoneProp
       {files.length > 0 && (
         <ul className={styles.files}>
           {files.map((f) => (
-            <li key={`${f.name}-${f.size}`} className={styles.file}>
+            <li key={`${f.name}-${f.size}`} className={styles.file} title={f.name}>
               <span className={styles.fileName}>{f.name}</span>
               <button type="button" aria-label={`Remove ${f.name}`} onClick={() => commit(files.filter((x) => x !== f))}>
-                <X size={14} />
+                <X size={16} strokeWidth={2} />
               </button>
             </li>
           ))}

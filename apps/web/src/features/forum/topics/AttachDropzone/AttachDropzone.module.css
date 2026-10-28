@@ -1,7 +1,7 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   width: fit-content;
   max-width: 100%;
 }
@@ -85,7 +85,7 @@
 .files {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -94,32 +94,49 @@
 .file {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  max-width: 240px;
-  height: 30px;
-  padding: 0 6px 0 12px;
-  border-radius: 36px;
+  gap: 10px;
+  max-width: 320px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 8px 0 16px;
+  border-radius: 8px;
+  background: var(--bg);
   box-shadow: var(--inset-sm);
-  font-size: 13px;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
 }
 
 .fileName {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--primary);
 }
 
 .file button {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  flex: none;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 6px;
   background: none;
   color: var(--text);
   cursor: pointer;
+}
+
+.file button:hover {
+  box-shadow: var(--raised-sm);
+  color: var(--primary);
+}
+
+.file button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
 }
 
 .error {
@@ -132,4 +149,5 @@
   .wrap { width: 100%; }
   .zone { flex-wrap: wrap; }
   .hint { font-size: 13px; }
+  .file { max-width: 100%; }
 }

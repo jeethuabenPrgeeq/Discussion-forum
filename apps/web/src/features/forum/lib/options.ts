@@ -5,13 +5,11 @@ import type { BulkAction, PersonRole, PersonStatus } from './types';
 
 export const ROLE_OPTIONS: { value: PersonRole; label: string }[] = [
   { value: 'learner', label: 'Learner' },
-  { value: 'assistant', label: 'Teaching Assistant' },
-  { value: 'instructor', label: 'Instructor' },
-  { value: 'observer', label: 'Observer' },
+  { value: 'observer', label: 'Auditor' },
 ];
 
 export const ROLE_FILTER_OPTIONS: { value: PersonRole | 'all'; label: string }[] = [
-  { value: 'all', label: 'All roles' },
+  { value: 'all', label: 'All Roles' },
   ...ROLE_OPTIONS,
 ];
 
@@ -22,7 +20,7 @@ export const GROUP_OPTIONS: { value: string; label: string }[] = [
 
 export const GROUP_FILTER_OPTIONS: { value: string; label: string }[] = [
   { value: 'all', label: 'All groups' },
-  ...GROUP_OPTIONS,
+  ...GROUPS.map((g) => ({ value: g, label: g })),
 ];
 
 export const STATUS_FILTER_OPTIONS: { value: PersonStatus | 'any'; label: string }[] = [
@@ -39,19 +37,20 @@ export const BULK_ACTION_OPTIONS: { value: BulkAction; label: string }[] = [
 ];
 
 export const TOPIC_FILTER_OPTIONS: SelectOption<TopicFilterKey>[] = [
-  { value: 'all', label: 'All Topics' },
-  { value: 'unread', label: 'Unread' },
+  { value: 'all', label: 'All topics' },
   { value: 'pinned', label: 'Pinned' },
   { value: 'answered', label: 'Answered' },
+  { value: 'unanswered', label: 'Unanswered' },
+  { value: 'locked', label: 'Locked' },
   { value: 'reported', label: 'Reported' },
+  { value: 'replyNeeded', label: 'Reply needed' },
 ];
 
 export const SORT_OPTIONS: SelectOption<TopicSort>[] = [
   { value: 'latest', label: 'Latest' },
-  { value: 'replies', label: 'Most Replies' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'answered', label: 'Answered' },
-  { value: 'reported', label: 'Reported' },
+  { value: 'replies', label: 'Most replies' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'az', label: 'A–Z' },
 ];
 
 export const FORUM_SETTING_OPTIONS = {

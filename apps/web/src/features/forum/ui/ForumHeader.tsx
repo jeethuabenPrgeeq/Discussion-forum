@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import type { ForumDetail } from "@/features/forum/lib/types";
 import { formatDay } from "@/features/forum/lib/utils";
 import styles from "./ForumHeader.module.css";
 
-export default function ForumHeader({ forum }: { forum: ForumDetail }) {
+export default function ForumHeader({ forum, status }: { forum: ForumDetail; status?: ReactNode }) {
   const deadlines = [
     { key: "post", label: "Post Due", date: forum.deadlines.postDue, tone: styles.blue },
     { key: "replies", label: "Replies Due", date: forum.deadlines.repliesDue, tone: styles.purple },
@@ -23,15 +24,17 @@ export default function ForumHeader({ forum }: { forum: ForumDetail }) {
           {forum.points} pts · {forum.gradingMode}
         </span>
         <span className={styles.chip}>{forum.instructor}</span>
-        <span className={styles.status}>
-          <span className={forum.isLive ? styles.live : styles.draft}>
-            <span className={styles.statusDot} />
-            {forum.isLive ? "Live" : "Draft"}
+        {status ?? (
+          <span className={styles.status}>
+            <span className={forum.isLive ? styles.live : styles.draft}>
+              <span className={styles.statusDot} />
+              {forum.isLive ? "Live" : "Draft"}
+            </span>
+            <span className={styles.posted}>
+              {forum.postedCount} of {forum.totalCount} posted
+            </span>
           </span>
-          <span className={styles.posted}>
-            {forum.postedCount} of {forum.totalCount} posted
-          </span>
-        </span>
+        )}
       </div>
 
       <ul className={styles.deadlines}>

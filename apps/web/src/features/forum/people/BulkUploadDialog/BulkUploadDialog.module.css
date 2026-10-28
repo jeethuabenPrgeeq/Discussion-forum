@@ -19,7 +19,7 @@
   overflow-y: auto;
   border-radius: 8px;
   background: #dfe6e9;
-  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+  box-shadow: none;
   color: #374151;
 }
 

@@ -1,12 +1,12 @@
 export type TopicState = "open" | "answered" | "notice";
 export type TopicStatus = TopicState | "pinned" | "locked";
 export type Participation = "required" | "optional" | null;
-export type TopicSort = "latest" | "replies" | "newest" | "answered" | "reported";
+export type TopicSort = "latest" | "replies" | "oldest" | "az";
 export type ForumTabKey = "forum" | "settings" | "people" | "grades" | "reports" | "access";
 export type AuthorRole = "learner" | "instructor" | "admin";
 export type Accent = "red" | "blue" | "purple" | "green" | "orange";
 export type TopicKind = 'discussion' | 'question' | 'notice';
-export type TopicFilterKey = "all" | "unread" | "pinned" | "answered" | "reported";
+export type TopicFilterKey = "all" | "pinned" | "answered" | "unanswered" | "locked" | "reported" | "replyNeeded";
 
 export interface ForumWeek {
   id: string;
@@ -46,6 +46,17 @@ export interface ForumAttachment {
   size: number;
 }
 
+export type FeedbackRating = 'great' | 'good' | 'needs_work';
+
+export interface PostFeedback {
+  rating: FeedbackRating;
+  criterion: string;
+  max: number;
+  marks: number | null;
+  note: string;
+  visible: boolean;
+}
+
 export interface ForumPost {
   id: string;
   topicId: string;
@@ -53,8 +64,34 @@ export interface ForumPost {
   body: string;
   createdAt: string;
   editedAt?: string;
+  editedBy?: AuthorRole;
+  editReason?: string;
+  hideEditTag?: boolean;
   isBestAnswer: boolean;
+  bonusMarks?: number;
   isPrivate: boolean;
+  allowReplyBack?: boolean;
+  replyToId?: string;
+  feedback?: string;
+  feedbackDetail?: PostFeedback;
+  reportedBy?: string[];
+  attachments: ForumAttachment[];
+}
+
+export interface ForumPost {
+  id: string;
+  topicId: string;
+  author: ForumAuthor;
+  body: string;
+  createdAt: string;
+  editedAt?: string;
+  editedBy?: AuthorRole;
+  editReason?: string;
+  hideEditTag?: boolean;
+  isBestAnswer: boolean;
+  bonusMarks?: number;
+  isPrivate: boolean;
+  allowReplyBack?: boolean;
   replyToId?: string;
   feedback?: string;
   attachments: ForumAttachment[];

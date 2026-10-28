@@ -47,7 +47,7 @@
 .trigger[aria-expanded='true'] .chevron { transform: rotate(180deg); }
 
 .root[data-variant='filter'] .trigger {
-  min-width: 128px;
+  min-width: 150px;
   height: 42px;
   padding: 0 8px 0 12px;
   border-radius: 4px;
@@ -71,11 +71,11 @@
 .panel {
   position: absolute;
   left: 0;
-  right: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-sizing: border-box;
   max-height: 300px;
   overflow-y: auto;
   background: var(--bg);
@@ -85,14 +85,17 @@
 
 .root[data-variant='filter'] .panel {
   top: calc(100% - 4px);
+  width: max-content;
   min-width: 100%;
-  padding: 20px 14px 16px;
-  border-radius: 0 0 8px 8px;
+  max-width: min(320px, calc(100vw - 32px));
+  padding: 20px 20px 16px 14px;
+  border-radius: 0 8px 8px 8px;
   box-shadow: var(--inset-sm);
 }
 
 .root[data-variant='field'] .panel {
   top: calc(100% - 9px);
+  right: 0;
   padding: 27px 24px 20px;
   border-radius: 0 0 8px 8px;
   box-shadow: var(--inset-md);
@@ -108,8 +111,11 @@
   line-height: 22px;
   letter-spacing: 0.02em;
   color: var(--text-strong);
-  white-space: nowrap;
   cursor: pointer;
+}
+
+.root[data-variant='filter'] .option {
+  white-space: nowrap;
 }
 
 .option[data-active] .optionLabel { color: var(--primary); }
@@ -143,8 +149,8 @@
 }
 
 .optionLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 @media (prefers-reduced-motion: reduce) {

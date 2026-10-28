@@ -78,10 +78,10 @@ export interface Scores {
 export function scoresOf(e: Evaluation): Scores {
   const { postCriteria, replyCriteria } = RUBRIC;
   const post = sumMarks(e.postMarks, postCriteria);
-  const replies = e.replyMarks.map((m) => sumMarks(m, replyCriteria));
+  const replies = (e.replyMarks ?? []).map((m) => sumMarks(m, replyCriteria));
   const total = post + replies.reduce((a, b) => a + b, 0);
-  const complete = isFilled(e.postMarks, postCriteria) && e.replyMarks.every((m) => isFilled(m, replyCriteria));
-  const valid = !hasError(e.postMarks, postCriteria) && !e.replyMarks.some((m) => hasError(m, replyCriteria));
+  const complete = isFilled(e.postMarks, postCriteria) && (e.replyMarks ?? []).every((m) => isFilled(m, replyCriteria));
+  const valid = !hasError(e.postMarks, postCriteria) && !(e.replyMarks ?? []).some((m) => hasError(m, replyCriteria));
   const percentage = Math.round((total / TOTAL_MAX) * 100);
   return { post, replies, total, percentage, grade: complete && valid ? gradeFor(percentage) : null, complete, valid };
 }
@@ -161,7 +161,7 @@ export const EVALUATOR_OPTIONS = [
 
 export function studentIdOf(person: ForumPerson) {
   const n = /^person-(\d+)$/.exec(person.id)?.[1];
-  return n ? `S${n.padStart(3, '0')}` : `S-${person.id.slice(0, 4).toUpperCase()}`;
+  return n ? `S${n.padStart(3, '0')}` : `S-${person.id.slice(-5).toUpperCase()}`;
 }
 
 export const initialsFor = (p: Pick<ForumPerson, 'firstName' | 'lastName'>) =>

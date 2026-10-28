@@ -1,0 +1,280 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: "Segoe UI", sans-serif;
+  color: #2f3547;
+}
+
+.card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #dfe6e9;
+  border-radius: 16px;
+  box-shadow: -4px -4px 4px #ffffff, 4px 4px 4px #c4c4c4;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+
+.filters,
+.toolActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px 24px;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 211px;
+  height: 42px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background: #dfe6e9;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c4c4c4;
+  color: #141b34;
+}
+
+.search:focus-within {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+}
+
+.searchInput::placeholder {
+  color: #7f7c7c;
+}
+
+.toolBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 4px;
+  background: #dfe6e9;
+  box-shadow: -2px -2px 2px #ffffff, 2px 2px 2px #c4c4c4;
+  font-family: inherit;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  color: #2f3547;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.toolBtn:active {
+  box-shadow: inset -2px -2px 2px #ffffff, inset 2px 2px 2px #c4c4c4;
+}
+
+.toolBtn:focus-visible {
+  outline: 2px solid #2d4cc8;
+  outline-offset: 2px;
+}
+
+.newTopic {
+  font-weight: 600;
+  color: #2d4cc8;
+}
+
+.tableScroll {
+  overflow: visible;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 1px solid #cdcdcd;
+}
+
+.colTopic {
+  width: 24%;
+}
+
+.colBy {
+  width: 13%;
+}
+
+.colReplies {
+  width: 9%;
+}
+
+.colActivity {
+  width: 13%;
+}
+
+.colStatus {
+  width: 11.5%;
+}
+
+.colNeeded {
+  width: 13.5%;
+}
+
+.colActions {
+  width: 16%;
+}
+
+.table th {
+  height: 48px;
+  padding: 0 14px;
+  background: #d7dfe3;
+  border-right: 1px solid #d7d5d5;
+  text-align: left;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table td {
+  height: 60px;
+  padding: 0 16px;
+  border-top: 1px solid #d7d5d5;
+  border-right: 1px solid #d7d5d5;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0.02em;
+  color: #2f3547;
+}
+
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+.table .center {
+  text-align: center;
+}
+
+.sortBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sortIconUp {
+  transform: rotate(180deg);
+}
+
+.topicCell {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.topicLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.topicLink:hover {
+  text-decoration-thickness: 2px;
+}
+
+.topicLink:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.open {
+  color: #7f7c7c;
+}
+
+.pinned {
+  color: #c05512;
+}
+
+.answered {
+  color: #2a7308;
+}
+
+.locked {
+  color: #c0122e;
+}
+
+.notice {
+  color: #2d4cc8;
+}
+
+.empty {
+  text-align: center;
+  color: #7f7c7c;
+}
+
+@media (max-width: 1200px) {
+  .tableScroll {
+    overflow-x: auto;
+    padding-bottom: 260px;
+    margin-bottom: -260px;
+  }
+
+  .table {
+    min-width: 960px;
+  }
+}
+
+@media (max-width: 560px) {
+  .search {
+    width: 100%;
+  }
+}
