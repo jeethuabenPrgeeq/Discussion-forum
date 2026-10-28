@@ -1,57 +1,60 @@
 databases:
-  - name: elab-db
+  - name: forum-db
+    databaseName: forum
+    user: forum
     plan: free
     region: singapore
-    databaseName: elab
-    user: elab
     postgresMajorVersion: "16"
 
 services:
   - type: web
-    name: elab-api
+    name: forum-api
     runtime: node
-    plan: free
     region: singapore
-    branch: deployment/digitalocean
-    buildCommand: npm install -g pnpm@12.4.1 && pnpm install --frozen-lockfile && pnpm --filter api exec prisma generate && pnpm --filter api exec prisma migrate deploy && pnpm --filter api exec node prisma/seed-catalog.mjs && pnpm --filter api build
-    startCommand: node apps/api/dist/main.js
-    healthCheckPath: /api/v1/status
+    plan: free
+    branch: feature/forum-complete
+    buildCommand: npm install -g pnpm@12.4.1 && pnpm install --frozen-lockfile && pnpm --filter api exec prisma generate && pnpm --filter api build
+    startCommand: pnpm --filter api exec prisma migrate deploy && node apps/api/dist/main.js
     envVars:
       - key: NODE_VERSION
-        sync: false
+        value: 22.12.0
+      - key: NODE_ENV
+        value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: elab-db
+          name: forum-db
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
-      - key: JWT_ACCESS_SECRET
-        generateValue: true
-      - key: ACCESS_TOKEN_MINUTES
+      - key: JWT_EXPIRES_DAYS
+        value: "7"
+      - key: WEB_ORIGIN
         sync: false
-      - key: REFRESH_TOKEN_DAYS
+      - key: DEFAULT_LEARNER_PASSWORD
         sync: false
-      - key: COOKIE_SECURE
-        value: "true"
-      - key: COOKIE_SAMESITE
-        value: lax
-      - key: FRONTEND_URL
+      - key: MAIL_FROM
         sync: false
-      - key: SEED_DEMO
-        value: "false"
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
 
   - type: web
-    name: elab-web
+    name: forum-web
     runtime: node
-    plan: free
     region: singapore
-    branch: deployment/digitalocean
+    plan: free
+    branch: feature/forum-complete
     buildCommand: npm install -g pnpm@12.4.1 && pnpm install --frozen-lockfile && pnpm --filter web build
     startCommand: pnpm --filter web start
     envVars:
       - key: NODE_VERSION
-        sync: false
-      - key: NEXT_PUBLIC_API_BASE_URL
-        value: /api/v1
-      - key: API_ORIGIN
+        value: 22.12.0
+      - key: NEXT_PUBLIC_API_URL
+        value: /api
+      - key: API_PROXY_TARGET
         sync: false
