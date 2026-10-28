@@ -4,3 +4,7 @@ node_modules
 dist
 .env*
 !.env.example
+
+*.tsbuildinfo
+/week*.pdf
+/week*.xlsx
