@@ -3,9 +3,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'dompurify';
-import { CalendarDays, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import AttachDropzone from '@/features/forum/topics/AttachDropzone/AttachDropzone';
 import BackLink from '@/components/ui/BackLink';
+import NeuDatePicker from '@/components/form/NeuDatePicker/NeuDatePicker';
 import DropdownMenu from '@/components/ui/DropdownMenu';
 import ConfirmDialog from '@/components/ui/ConfirmDialog/ConfirmDialog';
 import RichTextEditor, { type RichTextEditorHandle } from '@/components/editor/RichTextEditor';
@@ -337,15 +338,7 @@ export default function NewTopicView() {
               Reply by
             </label>
             <div className={styles.control} data-disabled={!replyByEnabled || undefined}>
-              <input
-                id={fieldId('reply-by')}
-                type="date"
-                className={styles.dateInput}
-                value={form.replyBy}
-                disabled={!replyByEnabled}
-                onChange={(e) => update('replyBy', e.target.value)}
-              />
-              <CalendarDays size={24} strokeWidth={1.5} className={styles.trailingIcon} aria-hidden />
+              <NeuDatePicker id={fieldId('reply-by')} value={form.replyBy} min={new Date().toISOString().slice(0, 10)} disabled={!replyByEnabled} label="reply-by date" onChange={(v) => update('replyBy', v)} />
             </div>
           </div>
           <SwitchField id={fieldId('grade')} label="Grade it" text="Permission for Grading" checked={form.graded} onChange={(v) => update('graded', v)} />
