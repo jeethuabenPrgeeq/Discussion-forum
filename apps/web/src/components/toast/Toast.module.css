@@ -75,3 +75,12 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+.toast[data-tone='success'] {
+  color: var(--green);
+}
+
+.toast[data-tone='success'] .icon {
+  fill: var(--green);
+  stroke: #ffffff;
+}
