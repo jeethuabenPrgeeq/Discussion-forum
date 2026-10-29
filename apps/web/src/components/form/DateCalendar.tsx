@@ -2,10 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './DateCalendar.module.css';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const HOURS_12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const MINUTE_STEP = 5;
 const MINUTES = Array.from({ length: 60 / MINUTE_STEP }, (_, i) => i * MINUTE_STEP);
@@ -63,10 +64,10 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
   const initial = validValue ? new Date(`${validValue}T00:00:00`) : new Date();
 
   const firstControlRef = useRef<HTMLButtonElement>(null);
-  const activeYearRef = useRef<HTMLButtonElement>(null);
   const [viewYear, setViewYear] = useState(initial.getFullYear());
   const [viewMonth, setViewMonth] = useState(initial.getMonth());
   const [mode, setMode] = useState<CalendarMode>('days');
+  const [yearStart, setYearStart] = useState(() => Math.floor(initial.getFullYear() / 12) * 12);
   const [selected, setSelected] = useState(validValue && !isPastDate(validValue) ? validValue : '');
   const [minutes, setMinutes] = useState(() => parseMinutes(time));
 
@@ -86,10 +87,6 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
       window.clearInterval(timer);
     };
   }, [onClose]);
-
-  useEffect(() => {
-    if (mode === 'years') activeYearRef.current?.scrollIntoView({ block: 'center' });
-  }, [mode]);
 
   const monthIndex = viewYear * 12 + viewMonth;
   const currentMonthIndex = now.year * 12 + now.month;
@@ -123,10 +120,6 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
   for (let day = 1; day <= daysInMonth; day += 1) cells.push({ day, type: 'curr' });
   for (let day = 1; cells.length < 42; day += 1) cells.push({ day, type: 'next' });
 
-  const startYear = Math.min(viewYear, now.year);
-  const endYear = Math.max(viewYear, now.year + 10);
-  const yearOptions = Array.from({ length: endYear - startYear + 1 }, (_, index) => startYear + index);
-
   const cellPosition = (type: CellType) => {
     let month = viewMonth;
     let year = viewYear;
@@ -156,14 +149,6 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
       setViewMonth(month);
       setViewYear(year);
     }
-  };
-
-  const pickToday = () => {
-    if (!todayAvailable) return;
-    setSelected(now.dateValue);
-    setViewMonth(now.month);
-    setViewYear(now.year);
-    setMode('days');
   };
 
   const hour24 = Math.floor(shownMinutes / 60);
@@ -199,36 +184,34 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.header}>
-          <button
-            ref={firstControlRef}
-            type="button"
-            className={styles.nav}
-            onClick={prevMonth}
-            disabled={!canGoBack}
-            aria-label="Previous month"
-          >
-            ‹
+          <button ref={firstControlRef} type="button" className={styles.nav} onClick={prevMonth} disabled={!canGoBack} aria-label="Previous month">
+            <ChevronLeft size={20} strokeWidth={1.75} aria-hidden />
           </button>
-          <div className={styles.titleRow}>
-            <button
-              type="button"
-              className={styles.titleButton}
-              onClick={() => setMode(mode === 'months' ? 'days' : 'months')}
-              aria-label="Choose month"
-            >
-              {MONTHS[viewMonth]}
-            </button>
-            <button
-              type="button"
-              className={styles.titleButton}
-              onClick={() => setMode(mode === 'years' ? 'days' : 'years')}
-              aria-label="Choose year"
-            >
-              {viewYear}
-            </button>
-          </div>
+          <button
+            type="button"
+            className={styles.titleButton}
+            data-active={mode === 'months' || undefined}
+            onClick={() => setMode(mode === 'months' ? 'days' : 'months')}
+            aria-label="Choose month"
+          >
+            {MONTHS[viewMonth].slice(0, 3)}
+            <ChevronDown size={16} strokeWidth={1.75} aria-hidden />
+          </button>
+          <button
+            type="button"
+            className={styles.titleButton}
+            data-active={mode === 'years' || undefined}
+            onClick={() => {
+              setYearStart(Math.floor(viewYear / 12) * 12);
+              setMode(mode === 'years' ? 'days' : 'years');
+            }}
+            aria-label="Choose year"
+          >
+            {viewYear}
+            <ChevronDown size={16} strokeWidth={1.75} aria-hidden />
+          </button>
           <button type="button" className={styles.nav} onClick={nextMonth} aria-label="Next month">
-            ›
+            <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
           </button>
         </div>
 
@@ -261,25 +244,37 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
         )}
 
         {mode === 'years' && (
-          <div className={styles.optionList} role="group" aria-label="Choose year">
-            {yearOptions.map((year) => (
-              <button
-                key={year}
-                ref={year === viewYear ? activeYearRef : undefined}
-                type="button"
-                className={cx(styles.option, year === viewYear && styles.optionActive)}
-                aria-pressed={year === viewYear}
-                disabled={year < now.year}
-                onClick={() => {
-                  setViewYear(year);
-                  if (year === now.year && viewMonth < now.month) setViewMonth(now.month);
-                  setMode('days');
-                }}
-              >
-                {year}
+          <>
+            <div className={styles.range}>
+              <button type="button" className={styles.round} onClick={() => setYearStart((y) => y - 12)} disabled={yearStart <= now.year} aria-label="Previous years">
+                <ChevronLeft size={20} strokeWidth={1.75} aria-hidden />
               </button>
-            ))}
-          </div>
+              <span className={styles.rangeLabel}>
+                {yearStart} - {yearStart + 11}
+              </span>
+              <button type="button" className={styles.round} onClick={() => setYearStart((y) => y + 12)} aria-label="Next years">
+                <ChevronRight size={20} strokeWidth={1.75} aria-hidden />
+              </button>
+            </div>
+            <div className={styles.optionList} role="group" aria-label="Choose year">
+              {Array.from({ length: 12 }, (_, i) => yearStart + i).map((year) => (
+                <button
+                  key={year}
+                  type="button"
+                  className={cx(styles.option, year === viewYear && styles.optionActive)}
+                  aria-pressed={year === viewYear}
+                  disabled={year < now.year}
+                  onClick={() => {
+                    setViewYear(year);
+                    if (year === now.year && viewMonth < now.month) setViewMonth(now.month);
+                    setMode('months');
+                  }}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          </>
         )}
 
         {mode === 'days' && (
@@ -373,11 +368,8 @@ export default function DateCalendar({ value, time = '', onChange, onClose, labe
         </div>
 
         <div className={styles.footer}>
-          <button type="button" className={styles.back} onClick={onClose}>
-            Back
-          </button>
-          <button type="button" className={styles.today} onClick={pickToday} disabled={!todayAvailable}>
-            Today
+          <button type="button" className={styles.cancel} onClick={onClose}>
+            Cancel
           </button>
           <button type="button" className={cx(styles.today, styles.set)} onClick={apply} disabled={!canSet}>
             Set

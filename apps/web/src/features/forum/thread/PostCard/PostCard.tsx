@@ -281,7 +281,7 @@ export default function PostCard({
           </p>
         )}
 
-        <div className={styles.body} dangerouslySetInnerHTML={{ __html: post.body }} />
+        <div data-rich className={styles.body} dangerouslySetInnerHTML={{ __html: post.body }} />
 
         {files.length > 0 && (
           <ul className={styles.files} aria-label="Attachments">

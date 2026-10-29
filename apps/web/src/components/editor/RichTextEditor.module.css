@@ -23,10 +23,14 @@
   margin: -4px;
   padding: 4px;
   overflow-x: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #b8c0c8 transparent;
+  padding-bottom: 8px;
 }
 
-.tools::-webkit-scrollbar { display: none; }
+.tools::-webkit-scrollbar { height: 6px; }
+.tools::-webkit-scrollbar-thumb { background: #b8c0c8; border-radius: 3px; }
+.tools::-webkit-scrollbar-track { background: transparent; }
 
 .group {
   display: flex;
@@ -237,6 +241,37 @@
 .editor[data-variant='inset'] {
   box-shadow: inset -4px -4px 4px var(--sh-light), inset 4px 4px 4px var(--sh-dark);
 }
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: 26px;
+  background: var(--line, #cdcdcd);
+}
+
+.blockSelect select { width: 140px; }
+
+.highlightSwatch {
+  display: inline-flex;
+  align-items: center;
+  color: #000;
+  border-bottom: 3px solid;
+}
+
+.content :global(h1) { margin: 8px 0; font-size: 28px; line-height: 36px; font-weight: 700; }
+.content :global(h2) { margin: 8px 0; font-size: 22px; line-height: 30px; font-weight: 700; }
+.content :global(h3) { margin: 6px 0; font-size: 18px; line-height: 26px; font-weight: 600; }
+.content :global(sup),
+.content :global(sub) { font-size: 0.75em; line-height: 0; }
+.content :global(img) { display: block; max-width: 100%; height: auto; margin: 8px 0; border-radius: 8px; }
+.content :global(img.ProseMirror-selectednode) { outline: 2px solid var(--primary); }
+.content :global(table) { width: 100%; margin: 8px 0; border-collapse: collapse; table-layout: fixed; }
+.content :global(th),
+.content :global(td) { position: relative; min-width: 60px; padding: 6px 10px; border: 1px solid #c4c4c4; vertical-align: top; }
+.content :global(th) { background: #d7dfe3; font-weight: 600; text-align: left; }
+.content :global(.selectedCell)::after { content: ''; position: absolute; inset: 0; background: rgba(45, 76, 200, 0.12); pointer-events: none; }
+.content :global(code) { padding: 1px 4px; border-radius: 4px; background: rgba(0, 0, 0, 0.06); font-family: Consolas, 'Courier New', monospace; }
+.content :global(pre code) { padding: 0; background: none; }
 
 @media (max-width: 767px) {
   .toolbar { min-height: 56px; padding: 10px 12px; gap: 12px; }

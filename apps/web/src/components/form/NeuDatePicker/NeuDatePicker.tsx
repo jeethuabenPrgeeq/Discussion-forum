@@ -67,7 +67,10 @@ export default function NeuDatePicker({ id, value, onChange, disabled, min, plac
     const left = Math.min(Math.max(GAP, rect.right - POPUP_WIDTH), window.innerWidth - POPUP_WIDTH - GAP);
     const below = rect.bottom + GAP;
     const above = rect.top - GAP - height;
-    const top = below + height > window.innerHeight - GAP && above > GAP ? above : below;
+    let top = below;
+    if (below + height > window.innerHeight - GAP) {
+      top = above >= GAP ? above : Math.max(GAP, window.innerHeight - height - GAP);
+    }
     setPos({ top, left: Math.max(GAP, left) });
   }, []);
 
@@ -90,11 +93,13 @@ export default function NeuDatePicker({ id, value, onChange, disabled, min, plac
     };
     document.addEventListener('pointerdown', onPointer);
     document.addEventListener('keydown', onKey);
+    const frame = window.requestAnimationFrame(place);
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
     return () => {
       document.removeEventListener('pointerdown', onPointer);
       document.removeEventListener('keydown', onKey);
+      window.cancelAnimationFrame(frame);
       window.removeEventListener('resize', place);
       window.removeEventListener('scroll', place, true);
     };

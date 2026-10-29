@@ -44,3 +44,21 @@ html, body {
 button, input, select { font: inherit; }
 
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+[data-rich] p { margin: 0; }
+[data-rich] h1 { margin: 8px 0; font-size: 28px; line-height: 36px; font-weight: 700; }
+[data-rich] h2 { margin: 8px 0; font-size: 22px; line-height: 30px; font-weight: 700; }
+[data-rich] h3 { margin: 6px 0; font-size: 18px; line-height: 26px; font-weight: 600; }
+[data-rich] sup,
+[data-rich] sub { font-size: 0.75em; line-height: 0; }
+[data-rich] ul,
+[data-rich] ol { margin: 0; padding-left: 24px; }
+[data-rich] blockquote { margin: 0; padding: 4px 12px; border-left: 3px solid var(--line-strong, #b8c0c8); color: var(--text-muted, #6b7280); }
+[data-rich] pre { margin: 0; padding: 10px 12px; border-radius: 8px; box-shadow: var(--inset-sm); font-family: Consolas, 'Courier New', monospace; font-size: 14px; white-space: pre-wrap; }
+[data-rich] code { font-family: Consolas, 'Courier New', monospace; }
+[data-rich] a { color: var(--primary, #2d4cc8); }
+[data-rich] img { display: block; max-width: 100%; height: auto; margin: 8px 0; border-radius: 8px; }
+[data-rich] table { width: 100%; margin: 8px 0; border-collapse: collapse; table-layout: fixed; }
+[data-rich] th,
+[data-rich] td { padding: 6px 10px; border: 1px solid #c4c4c4; vertical-align: top; overflow-wrap: anywhere; }
+[data-rich] th { background: #d7dfe3; font-weight: 600; text-align: left; }

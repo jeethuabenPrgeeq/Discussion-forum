@@ -190,3 +190,32 @@
   font-size: 17px;
   font-weight: 700;
 }
+.cell { position: relative; }
+
+.today {
+  color: #186348;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px #2a7308, 3px 3px 6px #c4c4c4, -3px -3px 6px #ffffff;
+}
+
+.today::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #2a7308;
+}
+
+.today[data-selected] {
+  color: #2d4cc8;
+  box-shadow: inset 0 0 0 2px #2a7308, inset 3px 3px 6px #c4c4c4, inset -3px -3px 6px #ffffff;
+}
+
+.popup {
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
